@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkk.cloudtv.core.mapper.RoomProgramMapper">
+    <select id="findObjByPage" resultType="RoomProgram">
+        SELECT *
+        FROM metoo_room_program
+        LIMIT #{startRow}, #{pageSize}
+    </select>
+    
+    <select id="findAccountByTotal" resultType="int">
+        SELECT COUNT(1)
+        FROM metoo_room_program
+    </select>
+
+    <insert id="insert" parameterType="com.hkk.cloudtv.entity.RoomProgram" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO metoo_room_program
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="title != null ">
+                title,
+            </if>
+            <if test="usernName != null">
+                usernName,
+            </if>
+            <if test="beginTime != null">
+                beginTime,
+            </if>
+            <if test="endTime!= null">
+                endTime,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="type!= null">
+                `type`,
+            </if>
+            <if test="info != null">
+                info,
+            </if>
+            <if test="poster !=null">
+                poster,
+            </if>
+            <if test="RoomId != null">
+                RoomId,
+            </if>
+            <if test="lecturer != null">
+                lecturer,
+            </if>
+            <if test="logoImg != null">
+                logoImg,
+            </if>
+            <if test="bindCode != null">
+                bindCode,
+            </if>
+            <if test="rtmp != null">
+                rtmp,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffixOverrides="," suffix=")">
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="title != null ">
+                #{title},
+            </if>
+            <if test="usernName != null">
+                #{usernName},
+            </if>
+            <if test="beginTime != null">
+                #{beginTime},
+            </if>
+            <if test="endTime!= null">
+                #{endTime},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="type!= null">
+                #{type},
+            </if>
+            <if test="info != null">
+                #{info},
+            </if>
+            <if test="poster !=null">
+                #{poster},
+            </if>
+            <if test="RoomId != null">
+                #{RoomId},
+            </if>
+            <if test="lecturer != null">
+                #{lecturer},
+            </if>
+            <if test="logoImg != null">
+                #{logoImg},
+            </if>
+            <if test ="bindCode != null">
+                #{bindCode},
+            </if>
+            <if test ="rtmp != null">
+                #{rtmp},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="RoomProgram">
+        UPDATE metoo_room_program
+        <set>
+            <if test="addTime != null">
+                addTime=#{addTime},
+            </if>
+            <if test="title != null ">
+                title=#{title},
+            </if>
+            <if test="usernName != null">
+                usernName=#{usernName},
+            </if>
+            <if test="beginTime != null">
+                beginTime=#{beginTime},
+            </if>
+            <if test="endTime!= null">
+                endTime=#{endTime},
+            </if>
+            <if test="status != null">
+                status=#{status},
+            </if>
+            <if test="type!= null">
+                type=#{type},
+            </if>
+            <if test="info != null">
+                info=#{info},
+            </if>
+            <if test="poster !=null">
+                poster=#{poster},
+            </if>
+            <if test="RoomId != null">
+                RoomId=#{RoomId},
+            </if>
+            <if test="lecturer != null">
+                lecturer=#{lecturer},
+            </if>
+            <if test="logoImg != null">
+                logoImg=#{logoImg},
+            </if>
+        </set>
+        <where>
+            <if test="id != null ">
+                id=#{id}
+            </if>
+        </where>
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE
+        FROM metoo_room_program
+        WHERE id=#{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkk.cloudtv.core.mapper.LiveRoomMapper">
+
+
+    <select id="getObjById" parameterType="java.lang.Long" resultType="LiveRoom">
+        SELECT *
+        FROM metoo_live_room
+        <where>
+            <if test="id != null">
+                id=#{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="findAllLiveRoom" resultType="com.hkk.cloudtv.entity.LiveRoom">
+        SELECT *
+        FROM metoo_live_room
+    </select>
+
+    <insert id="save" parameterType="com.hkk.cloudtv.entity.LiveRoom" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO metoo_live_room
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="manager != null">
+                manager,
+            </if>
+            <if test="managerPassword != null">
+                managerPassword,
+            </if>
+            <if test="info != null">
+                info,
+            </if>
+            <if test="telphone != null">
+                telphone,
+            </if>
+            <if test="isEnable != null">
+                isEnable,
+            </if>
+            <if test="logoImg != null">
+                logoImg,
+            </if>
+            <if test="onLine != null">
+                onLine,
+            </if>
+            <if test="maxOnline != null">
+                maxOnline,
+            </if>
+            <if test="istalk != null">
+                istalk,
+            </if>
+            <if test="isVip != null">
+                isVip,
+            </if>
+            <if test="pushAddress != null">
+                pushAddress,
+            </if>
+
+            <if test="bindCode != null">
+                bindCode,
+            </if>
+            <if test="rtmp != null">
+                rtmp,
+            </if>
+            <if test="flv != null">
+                flv,
+            </if>
+            <if test="websocketFlv != null">
+                websocketFlv,
+            </if>
+            <if test="ItemId != null">
+                ItemId,
+            </if>
+            <if test="deptId != null">
+                deptId,
+            </if>
+            <if test="isPlayback != null">
+                isPlayback
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus},
+            </if>
+            <if test="title != null">
+               #{title},
+            </if>
+            <if test="manager != null">
+                #{manager},
+            </if>
+            <if test="managerPassword != null">
+               #{managerPassword},
+            </if>
+            <if test="info != null">
+                #{info},
+            </if>
+            <if test="telphone != null">
+               #{telphone},
+            </if>
+            <if test="isEnable != null">
+                #{isEnable},
+            </if>
+            <if test="logoImg != null">
+                #{logoImg},
+            </if>
+            <if test="onLine != null">
+                #{onLine},
+            </if>
+            <if test="maxOnline != null">
+                #{maxOnline},
+            </if>
+            <if test="istalk != null">
+                #{istalk},
+            </if>
+            <if test="isVip != null">
+                #{isVip},
+            </if>
+            <if test="pushAddress != null">
+               #{pushAddress},
+            </if>
+
+            <if test="bindCode != null">
+                #{bindCode},
+            </if>
+            <if test="rtmp != null">
+               #{rtmp},
+            </if>
+            <if test="flv != null">
+                #{flv},
+            </if>
+            <if test="websocketFlv != null">
+               #{websocketFlv},
+            </if>
+            <if test="ItemId != null">
+                #{ItemId},
+            </if>
+            <if test="deptId != null">
+                #{deptId},
+            </if>
+            <if test="isPlayback != null">
+                #{isPlayback},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hkk.cloudtv.entity.LiveRoom">
+      UPDATE metoo_live_room
+        <set>
+            <if test="addTime != null">
+                addTime= #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus=#{deleteStatus},
+            </if>
+            <if test="title != null">
+                title=#{title},
+            </if>
+            <if test="manager != null">
+                manager=#{manager},
+            </if>
+            <if test="managerPassword != null">
+                managerPassword=#{managerPassword},
+            </if>
+            <if test="info != null">
+                info=#{info},
+            </if>
+            <if test="telphone != null">
+                telphone=#{telphone},
+            </if>
+            <if test="isEnable != null">
+                isEnable=#{isEnable},
+            </if>
+            <if test="logoImg != null">
+                logoImg=#{logoImg},
+            </if>
+            <if test="onLine != null">
+                onLine=#{onLine},
+            </if>
+            <if test="maxOnline != null">
+                maxOnline=#{maxOnline},
+            </if>
+            <if test="istalk != null">
+                istalk=#{istalk},
+            </if>
+            <if test="isVip != null">
+                isVip=#{isVip},
+            </if>
+            <if test="pushAddress != null">
+                pushAddress=#{pushAddress},
+            </if>
+
+            <if test="bindCode != null">
+                bindCode=#{bindCode},
+            </if>
+            <if test="rtmp != null">
+                rtmp=#{rtmp},
+            </if>
+            <if test="flv != null">
+                flv=#{flv},
+            </if>
+            <if test="websocketFlv != null">
+                websocketFlv=#{websocketFlv},
+            </if>
+            <if test="ItemId != null">
+                ItemId=#{ItemId},
+            </if>
+            <if test="deptId != null">
+                deptId=#{deptId},
+            </if>
+            <if test="isPlayback != null">
+                isPlayback=#{isPlayback},
+            </if>
+        </set>
+        <where>
+            id = #{id,jdbcType=BIGINT}
+        </where>
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM metoo_live_room
+        where id=#{id}
+    </delete>
+
+    <!--使用Limit实现分页-->
+    <select id="findByPager" resultType="LiveRoom">
+        SELECT *
+        FROM metoo_live_room
+        limit #{startRow},#{pageSize}
+    </select>
+
+    <select id="getAccountByTotal" resultType="int">
+        SELECT COUNT(1)
+        FROM metoo_live_room
+    </select>
+
+    <select id="selectAll" resultType="LiveRoom">
+        SELECT *
+        FROM metoo_live_room
+    </select>
+</mapper>

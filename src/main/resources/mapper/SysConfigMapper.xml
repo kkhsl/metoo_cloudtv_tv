@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkk.cloudtv.core.mapper.SysConfigMapper">
+
+    <select id="select" resultType="com.hkk.cloudtv.entity.SysConfig">
+        SELECT *
+        FROM metoo_sysconfig
+    </select>
+
+    <update id="update" parameterType="com.hkk.cloudtv.entity.SysConfig">
+        UPDATE metoo_sysconfig
+        <set>
+            <if test=" ip != null">
+              ip=#{ip}
+            </if>
+        </set>
+        <where>
+            <if test=" id != null">
+                id=#{id}
+            </if>
+        </where>
+    </update>
+
+</mapper>

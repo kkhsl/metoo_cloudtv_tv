@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkk.cloudtv.core.mapper.BuyerMapper">
+
+    <insert id="save" parameterType="com.hkk.cloudtv.entity.User" keyProperty="id" useGeneratedKeys="true">
+        insert into metoo_user
+        (id, username, password, salt)
+        values
+        (#{id,jdbcType=BIGINT},#{username},#{password},#{salt})
+    </insert>
+
+    <select id="findByUserName" parameterType="String" resultType="com.hkk.cloudtv.entity.User">
+        SELECT
+            id,
+            username,
+            password,
+            salt,
+            userRole
+        FROM
+            metoo_user
+        WHERE
+        username=#{username}
+    </select>
+
+    <resultMap id="userMap" type="User">
+        <id column="uid" property="id"/>
+        <result column="username" property="username"></result>
+        <!--角色信息-->
+        <collection property="roles" javaType="list" ofType="Role">
+            <id column="id" property="id"/>
+            <result column="name" property="name"></result>
+            <result column="roleCode" property="roleCode"></result>
+            <result column="type" property="type"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findRolesByUserName" parameterType="String" resultMap="userMap">
+        SELECT user.id uid,user.password,user.username,role.id,role.roleCode,role.name,role.type
+        FROM metoo_user user
+            LEFT JOIN metoo_user_role ur on user.id=ur.user_id
+            LEFT JOIN metoo_role role on role.id=ur.role_id
+        WHERE user.username=#{username}
+    </select>
+
+</mapper>

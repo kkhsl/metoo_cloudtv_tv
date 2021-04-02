@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hkk.cloudtv.core.mapper.ResMapper">
+
+    <select id="findResByRoleId" parameterType="list" resultType="res">
+        SELECT role.id role_id,role.name,role.roleCode,role.type, res.id,res.value
+        FROM metoo_role role
+        LEFT JOIN metoo_role_res rs
+        ON role.id=rs.role_id
+        LEFT JOIN metoo_res res
+        ON rs.res_id=res.id
+        WHERE role.id=#{id}
+    </select>
+
+</mapper>
