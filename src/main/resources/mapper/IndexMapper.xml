@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.tv.core.mapper.IndexMapper">
+
+    <resultMap id="Base_Menu_Map" type="com.cloud.tv.vo.MenuVo">
+        <result column="roleGroupId" property="roleGroupId"></result>
+        <result column="roleGroupName" property="roleGroupName"></result>
+        <result column="roleGroupIcon" property="roleGroupIcon"></result>
+        <result column="roleGroupUrl" property="roleGroupUrl"></result>
+        <collection property="role" ofType="com.cloud.tv.req.RoleReq">
+            <id column="roleId" property="roleId"></id>
+            <result column="roleName" property="roleName"></result>
+            <result column="roleUrl" property="roleUrl"></result>
+            <result column="roleComponent" property="roleComponent"></result>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        mrg.id roleGroupId, mrg.`name` roleGroupName, mrg.icon roleGroupIcon,mrg.url roleGroupUrl,
+        mr.id roleId, mr.name roleName, mr.url roleUrl, mr.component roleComponent
+    </sql>
+
+    <select id="findMenu" parameterType="java.lang.Long" resultMap="Base_Menu_Map">
+       SELECT <include refid="Base_Column_List" />
+        FROM metoo_role_group mrg
+        LEFT JOIN metoo_role mr ON mr.rg_id = mrg.id
+        LEFT JOIN metoo_user_role mur ON mur.role_id = mr.id
+        LEFT JOIN metoo_user mu ON mu.id = mur.user_id
+        WHERE
+        mu.id = #{userId}
+        ORDER BY mrg.sequence DESC, mr.sequence DESC
+    </select>
+
+</mapper>

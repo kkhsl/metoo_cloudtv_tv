@@ -1,18 +1,87 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hkk.cloudtv.core.mapper.RoomProgramMapper">
-    <select id="findObjByPage" resultType="RoomProgram">
+<mapper namespace="com.cloud.tv.core.mapper.RoomProgramMapper">
+
+
+    <sql id="Base_Column_List">
+        mrp.id, mrp.status, mrp.live,mrp.playback
+    </sql>
+
+    <select id="findObjById" resultType="com.cloud.tv.entity.RoomProgram">
         SELECT *
         FROM metoo_room_program
-        LIMIT #{startRow}, #{pageSize}
+        WHERE
+        id=#{id}
     </select>
-    
+
+
+    <!--AND mrp.roomName LIKE '%${roomName}%'-->
+    <!--AND mrp.roomName LIKE "%"#{roomName, jdbcType=VARCHAR}"%"-->
+    <!--AND mrp.roomName LIKE CONCAT('%', #{roomName}, '%')-->
+    <!--AND mrp.roomName LIKE CONCAT('%', '${roomName}', '%')-->
+    <select id="query" parameterType="com.cloud.tv.dto.RoomProgramDto" resultType="com.cloud.tv.entity.RoomProgram">
+      SELECT *
+      FROM metoo_room_program mrp
+      <where>
+          <if test = "status != null">
+            AND mrp.status = #{status}
+          </if>
+          <if test = "roomId != null">
+            AND mrp.roomId = #{roomId}
+          </if>
+          <if test = "roomName != null and roomName != ''">
+              AND mrp.roomName LIKE CONCAT('%', #{roomName}, '%')
+          </if>
+          AND mrp.deleteStatus = 0
+      </where>
+    </select>
+
+
+    <select id="findObjByLiveRoomId" parameterType="map" resultType="com.cloud.tv.entity.RoomProgram">
+        SELECT *
+        FROM metoo_room_program
+        <where>
+            <if test = "status != null">
+                AND status = #{status}
+            </if>
+            <if test = "live != null">
+                AND live = #{live}
+            </if>
+            <if test="roomId != null">
+                AND roomId = #{roomId}
+            </if>
+        </where>
+    </select>
+
     <select id="findAccountByTotal" resultType="int">
         SELECT COUNT(1)
         FROM metoo_room_program
     </select>
 
-    <insert id="insert" parameterType="com.hkk.cloudtv.entity.RoomProgram" useGeneratedKeys="true" keyProperty="id">
+    <select id="findObjByPage" resultType="com.cloud.tv.entity.RoomProgram">
+        SELECT *
+        FROM metoo_room_program
+        <where>
+            <if test="deleteStatus != null">
+                AND deleteStatus = #{deleteStatus}
+            </if>
+            <if test="userId != null">
+                AND userId = #{userId}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="userId != null">
+                AND userId = #{userId}
+            </if>
+        </where>
+        ORDER BY addTime
+        DESC
+        LIMIT #{startRow}, #{pageSize}
+    </select>
+
+
+    <insert id="insert" parameterType="com.cloud.tv.entity.RoomProgram" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO metoo_room_program
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="addTime != null">
@@ -21,8 +90,11 @@
             <if test="title != null ">
                 title,
             </if>
-            <if test="usernName != null">
-                usernName,
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="userName != null">
+                userName,
             </if>
             <if test="beginTime != null">
                 beginTime,
@@ -42,20 +114,41 @@
             <if test="poster !=null">
                 poster,
             </if>
-            <if test="RoomId != null">
-                RoomId,
+            <if test="roomId != null">
+                roomId,
+            </if>
+            <if test="roomName != null and roomName != ''">
+                roomName,
             </if>
             <if test="lecturer != null">
                 lecturer,
             </if>
-            <if test="logoImg != null">
-                logoImg,
+            <if test="cover != null">
+                cover,
             </if>
-            <if test="bindCode != null">
-                bindCode,
+            <if test="playback != null">
+                playback,
             </if>
-            <if test="rtmp != null">
-                rtmp,
+            <if test="isPlayback != null">
+                isPlayback,
+            </if>
+            <if test="grade != null">
+                grade_id,
+            </if>
+            <if test="gradeName != null">
+                gradeName,
+            </if>
+            <if test="course != null">
+                course_id,
+            </if>
+            <if test="courseName != null">
+                courseName,
+            </if>
+            <if test="user != null">
+                userId,
+            </if>
+            <if test="display != null">
+                display,
             </if>
         </trim>
         <trim prefix="VALUES (" suffixOverrides="," suffix=")">
@@ -65,8 +158,11 @@
             <if test="title != null ">
                 #{title},
             </if>
-            <if test="usernName != null">
-                #{usernName},
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="userName != null">
+                #{userName},
             </if>
             <if test="beginTime != null">
                 #{beginTime},
@@ -86,35 +182,59 @@
             <if test="poster !=null">
                 #{poster},
             </if>
-            <if test="RoomId != null">
-                #{RoomId},
+            <if test="roomId != null">
+                #{roomId},
+            </if>
+            <if test="roomName != null and roomName != ''">
+                #{roomName},
             </if>
             <if test="lecturer != null">
                 #{lecturer},
             </if>
-            <if test="logoImg != null">
-                #{logoImg},
+            <if test="cover != null">
+                #{cover},
             </if>
-            <if test ="bindCode != null">
-                #{bindCode},
+            <if test="playback != null">
+                #{playback},
             </if>
-            <if test ="rtmp != null">
-                #{rtmp},
+            <if test="isPlayback != null">
+                #{isPlayback},
+            </if>
+            <if test="grade != null">
+                #{grade.id},
+            </if>
+            <if test="gradeName != null">
+                #{gradeName},
+            </if>
+            <if test="course != null">
+                #{course.id},
+            </if>
+            <if test="courseName != null">
+                #{courseName},
+            </if>
+            <if test="user != null">
+                #{user.id},
+            </if>
+            <if test="display != null">
+                #{display},
             </if>
         </trim>
     </insert>
 
-    <update id="update" parameterType="RoomProgram">
+    <update id="update" parameterType="com.cloud.tv.entity.RoomProgram">
         UPDATE metoo_room_program
         <set>
-            <if test="addTime != null">
-                addTime=#{addTime},
+            <if test="deleteStatus != null">
+                deleteStatus=#{deleteStatus},
             </if>
             <if test="title != null ">
                 title=#{title},
             </if>
-            <if test="usernName != null">
-                usernName=#{usernName},
+            <if test="userId != null">
+                userId=#{userId},
+            </if>
+            <if test="userName != null">
+                userName=#{userName},
             </if>
             <if test="beginTime != null">
                 beginTime=#{beginTime},
@@ -126,7 +246,7 @@
                 status=#{status},
             </if>
             <if test="type!= null">
-                type=#{type},
+                `type` = #{type},
             </if>
             <if test="info != null">
                 info=#{info},
@@ -134,14 +254,44 @@
             <if test="poster !=null">
                 poster=#{poster},
             </if>
-            <if test="RoomId != null">
-                RoomId=#{RoomId},
+            <if test="roomId != ''">
+                roomId=#{roomId},
+            </if>
+            <if test="roomName != null and roomName != ''">
+                roomName=#{roomName},
             </if>
             <if test="lecturer != null">
                 lecturer=#{lecturer},
             </if>
-            <if test="logoImg != null">
-                logoImg=#{logoImg},
+            <if test="cover != null">
+                cover=#{cover},
+            </if>
+            <if test="live != null">
+                live=#{live},
+            </if>
+            <if test="playback != null">
+                playback=#{playback},
+            </if>
+            <if test="isPlayback != null">
+                isPlayback = #{isPlayback},
+            </if>
+            <if test="grade != null">
+                grade_id = #{grade.id},
+            </if>
+            <if test="gradeName != null">
+                gradeName = #{gradeName},
+            </if>
+            <if test="course != null">
+                course_id = #{course.id},
+            </if>
+            <if test="courseName != null">
+                courseName = #{courseName},
+            </if>
+            <if test="user != null">
+                userId = #{user.id},
+            </if>
+            <if test="display != null">
+                display = #{display},
             </if>
         </set>
         <where>
@@ -157,4 +307,35 @@
         WHERE id=#{id}
     </delete>
 
+    <select id="condition" parameterType="map" resultType="com.cloud.tv.entity.RoomProgram">
+        SELECT *
+        FROM metoo_room_program mrp
+        <where>
+            <if test = "status != null">
+                AND status=#{status}
+            </if>
+            <if test = "live != null">
+                AND live=#{live}
+            </if>
+            <if test="roomId">
+                AND roomId = #{roomId}
+            </if>
+            <if test = "userId != null">
+                AND userId=#{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="livestatus" parameterType="map" resultType="com.cloud.tv.entity.RoomProgram">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_room_program mrp
+        <where>
+            <if test="status != null">
+                AND status=#{status}
+            </if>
+            <if test="live != null">
+                AND live=#{live}
+            </if>
+        </where>
+    </select>
 </mapper>

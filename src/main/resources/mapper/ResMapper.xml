@@ -1,15 +1,131 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hkk.cloudtv.core.mapper.ResMapper">
+<mapper namespace="com.cloud.tv.core.mapper.ResMapper">
 
-    <select id="findResByRoleId" parameterType="list" resultType="res">
+    <resultMap id="ResRole_Unit_Map" type="com.cloud.tv.entity.Res">
+        <id column="mp_id" property="id"></id>
+        <result column="mp_addTime" property="addTime"></result>
+        <result column="mp_name" property="name"></result>
+        <result column="mp_value" property="value"></result>
+        <result column="mp_type" property="type"></result>
+        <association property="role" column="role_id" javaType="com.cloud.tv.entity.Role" >
+            <id property="id" column="mr_id" />
+            <result property="name" column="mr_name"></result>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, addTime, deleteStatus, name, value, type
+    </sql>
+
+    <select id="findResByRoleId" parameterType="java.lang.Long" resultType="com.cloud.tv.entity.Res">
         SELECT role.id role_id,role.name,role.roleCode,role.type, res.id,res.value
-        FROM metoo_role role
-        LEFT JOIN metoo_role_res rs
-        ON role.id=rs.role_id
-        LEFT JOIN metoo_res res
-        ON rs.res_id=res.id
+        FROM metoo_res res
+        LEFT JOIN metoo_role_res rr  ON rr.res_id=res.id
+        LEFT JOIN metoo_role role ON role.id=rr.role_id
         WHERE role.id=#{id}
     </select>
 
+    <select id="findResByAll" resultType="com.cloud.tv.entity.Res">
+        SELECT <include refid="Base_Column_List" />
+        FROM metoo_res mr
+        ORDER BY mr.addTime
+        DESC
+    </select>
+
+    <select id="selectPrimaryById" parameterType="java.lang.Long" resultType="com.cloud.tv.entity.Res">
+        SELECT <include refid="Base_Column_List" />
+        FROM metoo_res mr
+        WHERE mr.id=#{id, jdbcType=BIGINT}
+    </select>
+
+     <select id="findResUnitRoleByResId" parameterType="java.lang.Long" resultMap="ResRole_Unit_Map">
+         SELECT mp.id mp_id, mp.addTime mp_addTime, mp.name mp_name, mp.value mp_value, mp.type mp_type,
+				mr.id mr_id, mr.name mr_name
+         FROM metoo_res mp
+           LEFT JOIN metoo_role mr ON mp.role_id=mr.id
+           WHERE mp.id=#{id, jdbcType=BIGINT}
+     </select>
+
+    <select id="findResByResIds" parameterType="list" resultType="com.cloud.tv.entity.Res">
+        SELECT *
+        FROM metoo_res mr
+        WHERE mr.id
+        IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <insert id="save" parameterType="com.cloud.tv.entity.Res" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO metoo_res
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="value != null">
+                value,
+            </if>
+            <if test="type = null">
+                type,
+            </if>
+            <if test="role = null">
+                role_id,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffixOverrides="," suffix=")">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="value != null">
+                #{value},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="role != null">
+                #{role.id},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.cloud.tv.entity.Res">
+        UPDATE metoo_res mr
+        <set>
+            <if test="name != null">
+                name=#{name},
+            </if>
+            <if test="value != null">
+                value=#{value},
+            </if>
+            <if test="type != null">
+                type=#{type},
+            </if>
+            <if test="role != null">
+                role_id=#{role.id},
+            </if>
+        </set>
+        <where>
+            <if test="id != null">
+                id=#{id}
+            </if>
+        </where>
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM metoo_res
+        WHERE id=#{id, jdbcType=BIGINT}
+    </delete>
 </mapper>
