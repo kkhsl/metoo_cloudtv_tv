@@ -100,7 +100,7 @@
         ORDER BY mv.addTime DESC
     </select>
 
-    <select id="findObjByReq" parameterType="com.cloud.tv.req.VideoReq" resultMap="Unite_Map">
+    <select id="query" parameterType="com.cloud.tv.req.VideoReq" resultMap="Unite_Map">
         SELECT <include refid="unite_Column_List" />
         FROM metoo_video mv
         LEFT JOIN metoo_accessory ma on mv.accessory_id=ma.id
@@ -110,7 +110,7 @@
         LEFT JOIN metoo_live_room mlr ON mlr.id = mv.liveRoomId
         <where>
 
-            <if test="userId">
+            <if test="userId != null">
                 AND mv.userId = #{userId, jdbcType=BIGINT}
             </if>
             <if test="display != null">
@@ -119,8 +119,8 @@
             <if test="status != null">
                 AND mv.status = #{status}
             </if>
-            <if test="startTime != null and endTime != null">
-                AND mv.addTime BETWEEN #{startTime} AND #{endTime}
+            <if test="beginTime != null and endTime != null">
+                AND mv.addTime BETWEEN #{beginTime} AND #{endTime}
             </if>
             <if test = "type != null">
                 AND mv.type = #{type}
@@ -162,7 +162,7 @@
         LEFT JOIN metoo_course mc on mv.course_id=mc.id
         LEFT JOIN metoo_live_room mlr ON mlr.id = mv.liveRoomId
         <where>
-            <if test="deleteStatus">
+            <if test="deleteStatus != null">
                 AND mv.deleteStatus = #{deleteStatus}
             </if>
             <if test="userId">
@@ -174,8 +174,8 @@
             <if test="status != null">
                 AND mv.status = #{status}
             </if>
-            <if test="startTime != null and endTime != null">
-                AND mv.addTime BETWEEN #{startTime} AND #{endTime}
+            <if test="beginTime != null and endTime != null">
+                AND mv.addTime BETWEEN #{beginTime} AND #{endTime}
             </if>
             <if test = "type != null">
                 AND mv.type = #{type}

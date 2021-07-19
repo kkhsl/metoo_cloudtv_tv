@@ -1,5 +1,6 @@
 package com.cloud.tv.core.mapper;
 
+import com.cloud.tv.dto.VideoDto;
 import com.cloud.tv.entity.Video;
 import com.cloud.tv.req.VideoReq;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,27 +18,15 @@ public interface VideoMapper {
      */
     Video get(Long id);
 
-    List<Video> find(Map params);
-
     int insert(Video instance);
 
     int update(Video instance);
 
     int delete(Long id);
 
-    /**
-     * 查询总数
-     * @return
-     */
-    int getAccountByTotal();
-
-    /**
-     * pageHelper 分页插件；查询所有
-     * @return
-     */
     List<Video> selectAll();
 
-    List<Video> findObjByReq(VideoReq req);
+    List<Video> query(VideoDto dto);
 
     List<Video> findObjByMap(Map map);
 

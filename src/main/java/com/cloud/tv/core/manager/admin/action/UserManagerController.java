@@ -193,8 +193,6 @@ public class UserManagerController {
             if(StringUtils.isEmpty(dto.getType())){
                 return ResponseUtil.badArgument("请选择用户类型");
             }
-
-
             if( this.userService.save(dto)){
                 return ResponseUtil.ok();
             }
@@ -215,7 +213,7 @@ public class UserManagerController {
             // 清空用户直播间
             Map params = new HashMap();
             params.put("userId", user.getId());
-            List<LiveRoom> liveRoomList = this.liveRoomService.query(params);
+            List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
             for(LiveRoom liveRoom : liveRoomList){
                 liveRoom.setDeleteStatus(-1);
                 this.liveRoomService.update(liveRoom);

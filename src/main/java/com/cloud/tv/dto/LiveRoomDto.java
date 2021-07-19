@@ -16,9 +16,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class LiveRoomDto extends PageDto<LiveRoom>{
 
-
     @ApiModelProperty("直播间ID")
     private Long id;
+
+    @ApiModelProperty("软删除")
+    private int deleteStatus = 0;
 
     @ApiModelProperty
     private String title;
@@ -62,5 +64,5 @@ public class LiveRoomDto extends PageDto<LiveRoom>{
     @ApiModelProperty("科目IDS")
     private Integer[] course;
 
-
+    private Integer roomProgramStatus;
 }

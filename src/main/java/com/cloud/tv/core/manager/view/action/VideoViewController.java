@@ -1,6 +1,7 @@
 package com.cloud.tv.core.manager.view.action;
 
 import com.cloud.tv.core.service.*;
+import com.cloud.tv.dto.VideoDto;
 import com.cloud.tv.entity.*;
 import com.cloud.tv.req.VideoReq;
 import com.github.pagehelper.Page;
@@ -84,19 +85,19 @@ public class VideoViewController {
 //    @RequiresPermissions("WEB:VIDEO:LIST")
     @ApiOperation("客户端视频列表")
     @PostMapping("/list")
-    public Object list(@RequestBody(required = false) VideoReq req){
+    public Object list(@RequestBody(required = false) VideoDto dto){
 
         Map map = new HashMap();
         SysConfig config = this.configService.findSysConfigList();
-        if(req.getCurrentPage() == null){
-            req.setCurrentPage(1);
+        if(dto.getCurrentPage() == null){
+            dto.setCurrentPage(1);
         }
-        if(req.getPageSize() == null){
-            req.setPageSize(15);
+        if(dto.getPageSize() == null){
+            dto.setPageSize(15);
         }
-        if(req.getAddTime() != null){
-            req.setStartTime(CommUtils.appointedDay(req.getAddTime() == null ? -6 : ~(req.getAddTime())+2));
-            req.setEndTime(CommUtils.appointedDay(1));
+        if(dto.getAddTime() != null){
+            dto.setBeginTime(CommUtils.appointedDay(dto.getAddTime() == null ? -6 : ~(dto.getAddTime())+2));
+            dto.setEndTime(CommUtils.appointedDay(1));
         }
    /*     Map params = new HashMap();
         params.put("currentPage", currentPage);
@@ -111,13 +112,13 @@ public class VideoViewController {
         params.put("endTime", CommUtils.appointedDay(0));
         params.put("type", type);
 */
-        req.setDisplay(1);
-        req.setStatus(1);
-        req.setIsEnable(1); // 默认0：关闭 1：开启
-        req.setOrderBy("addTime");
-        req.setOrderType("DESC");
+        dto.setDisplay(1);
+        dto.setStatus(1);
+        dto.setIsEnable(1); // 默认0：关闭 1：开启
+        dto.setOrderBy("addTime");
+        dto.setOrderType("DESC");
 
-        Page<Video> page =  this.videoService.findObjByReq(req);
+        Page<Video> page =  this.videoService.query(dto);
 
         map.put("obj", page.getResult());
         map.put("currentPage", page.getPageNum());

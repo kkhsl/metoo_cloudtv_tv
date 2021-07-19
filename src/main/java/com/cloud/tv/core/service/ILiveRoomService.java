@@ -1,5 +1,6 @@
 package com.cloud.tv.core.service;
 
+import com.cloud.tv.dto.LiveRoomDto;
 import com.cloud.tv.entity.LiveRoom;
 import com.cloud.tv.vo.WebLiveRoomVo;
 import com.github.pagehelper.Page;
@@ -13,7 +14,23 @@ public interface ILiveRoomService {
      * @param id
      * @return
      */
-    public LiveRoom getObjById(Long id);
+    LiveRoom getObjById(Long id);
+
+
+    /**
+     *分页查询
+     * @param dto
+     * @return
+     */
+    Page<LiveRoom> query(LiveRoomDto dto);
+
+    /**
+     * 条件查询
+     * @param params
+     * @return
+     */
+    List<LiveRoom> findObjByMap(Map<String, Object> params);
+
 
     /**
      * 查询所有的LiveRoom对象
@@ -43,12 +60,6 @@ public interface ILiveRoomService {
      */
     int delete(Long id);
 
-    /**
-     *分页查询
-     * @param params
-     * @return
-     */
-    List<LiveRoom> query(Map<String, Object> params);
 
     /**
      * 查询总数
@@ -63,8 +74,6 @@ public interface ILiveRoomService {
      * @return
      */
    List<LiveRoom> queryLiveRooms(Integer currentPage, Integer pageSize);
-
-   List<LiveRoom> findObjByMap(Map<String, Object> params);
 
    Page<WebLiveRoomVo> webLiveRoom(Map<String, Object> params);
 

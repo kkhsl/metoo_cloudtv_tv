@@ -47,7 +47,7 @@ public class LiveRoom extends IdEntity{
     @ApiModelProperty("直播间联系电话")
     private String telephone;
 
-    @ApiModelProperty("是否禁用直播间 默认 -1：禁用 0：关闭 1：开启")
+    @ApiModelProperty("是否禁用直播间 默认 -1：禁用  0：关闭 1：开启")
     private Integer isEnable;
 
     @ApiModelProperty("直播间是否有推流 0：停止 1：开启")

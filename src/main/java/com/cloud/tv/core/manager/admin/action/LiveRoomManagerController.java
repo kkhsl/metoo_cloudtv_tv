@@ -2,6 +2,7 @@ package com.cloud.tv.core.manager.admin.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cloud.tv.core.service.*;
+import com.cloud.tv.core.utils.query.PageInfo;
 import com.cloud.tv.entity.*;
 import com.cloud.tv.core.service.*;
 import com.cloud.tv.core.POJO.QueryFilter;
@@ -12,6 +13,7 @@ import com.cloud.tv.core.utils.ResponseUtil;
 import com.cloud.tv.dto.LiveRoomDto;
 import com.cloud.tv.entity.*;
 import com.cloud.tv.vo.Result;
+import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -132,7 +134,7 @@ public class LiveRoomManagerController {
             int startRow = (dto.getCurrentPage() - 1) * dto.getPageSize();
             // 封装分页参数
             Map<String ,Object> params = new HashMap();
-            params.put("startRow", startRow);
+            params.put("currentPage", startRow);
             params.put("pageSize", dto.getPageSize());
 
             /*  if(!user.getUserRole().equals("SUPPER")){
@@ -151,7 +153,7 @@ public class LiveRoomManagerController {
             }*/
             params.put("deleteStatus", 0);
             params.put("userId", user.getId());
-            List<LiveRoom> liveRooms = this.liveRoomService.query(params);
+            List<LiveRoom> liveRooms = this.liveRoomService.findObjByMap(params);
             map.put("pages", totalPages);
             map.put("totalRow",totalRow);
             map.put("pageSize", liveRooms.size());
@@ -174,7 +176,7 @@ public class LiveRoomManagerController {
     public Object update(@RequestBody LiveRoom room){
         Map params = new HashMap();
         params.put("id", room.getId());
-        List<LiveRoom> liveRoomList = this.liveRoomService.query(params);
+        List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if(liveRoomList.size() > 0){
             SysConfig sysConfig = this.configService.findSysConfigList();
             LiveRoom liveRoom = liveRoomList.get(0);
@@ -463,51 +465,19 @@ public class LiveRoomManagerController {
 
 
 
-    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:LIST")
+//    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:LIST")
     @ApiOperation("直播间管理-列表")
     @RequestMapping(value = "/manager/list")
     public Object buyerLiveRoom(@RequestBody LiveRoomDto dto) {
         Map map = new HashMap();
-        User user = ShiroUserHolder.currentUser();
-        // 分页查询
-        if(dto.getCurrentPage() == null || dto.getCurrentPage().equals("")){
-            dto.setCurrentPage(1);
+        Page<LiveRoom> page  = this.liveRoomService.query(dto);
+        if(page.getResult().size() > 0){
+            map.put("obj", new PageInfo<LiveRoom>(page));
+            SysConfig configs = this.configService.findSysConfigList();
+            map.put("domain", configs.getDomain());
+            return ResponseUtil.ok(map);
         }
-        if(dto.getPageSize() == null || dto.getPageSize().equals("")){
-            dto.setPageSize(15);
-        }
-        int totalRow = this.liveRoomService.findAccountByTotal();// 查询总数
-        if(totalRow > 0){
-            int totalPages = totalRow / dto.getPageSize();// 总页数
-            int left = totalRow % dto.getPageSize();
-            if(left > 0){
-                totalPages += 1;
-            }
-            // 判断用户是否手动修改页码
-            if(dto.getCurrentPage() > totalPages){
-                dto.setCurrentPage(totalPages);
-            }
-            // 起始行
-            int startRow = (dto.getCurrentPage() - 1) * dto.getPageSize();
-            // 封装分页参数
-            Map<String ,Object> params = new HashMap();
-            params.put("startRow", startRow);
-            params.put("pageSize", dto.getPageSize());
-            params.put("type", 0);
-          /*  if(!user.getUserRole().equals("SUPPER")){
-                // 控制类型参数只能为0：避免前端篡改传参
-                params.put("type", 0);
-            }*/
-            params.put("deleteStatus", 0);
-            List<LiveRoom> liveRooms = this.liveRoomService.query(params);
-            map.put("pages", totalPages);
-            map.put("totalRow",totalRow);
-            map.put("pageSize", liveRooms.size());
-            map.put("list", liveRooms);
-            map.put("userRole", user.getUserRole());
-
-        }
-        return new Result(200, "Successfully", map);
+        return ResponseUtil.ok();
     }
 
     /**
@@ -515,7 +485,7 @@ public class LiveRoomManagerController {
      * @param room
      * @return
      */
-    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:UPDATE")
+//    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:UPDATE")
     @ApiOperation("直播间管理-更新")
     @RequestMapping("/manager/update")
     public Object managerUpdate(@RequestBody LiveRoom room){
@@ -527,54 +497,11 @@ public class LiveRoomManagerController {
     }
 
     /**
-     * 删除直播间
-     * @param
-     * @param
-     * @param
-     * @return
-     */
-    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:DELETE")
-    @ApiOperation("直播间管理-删除")
-    @RequestMapping(value = "/manager/delete")
-    public Object managerDelete(@RequestBody LiveRoomDto dto){
-        if(dto.getId() != null || !dto.getId().equals("")){
-            int flag = this.liveRoomService.delete(dto.getId());
-            if(flag == 1){
-                // 清除直播关联关系 这里优化为批量更新
-                Map params = new HashMap();
-                params.put("roomId", dto.getId());
-                List<RoomProgram> roomPrograms = this.roomProgramService.findRoomProgramByLiveRoomId(params);
-                if(roomPrograms.size() > 0){
-                    for(RoomProgram roomProgram : roomPrograms){
-                        System.out.println("========" + roomProgram.getId());
-                        roomProgram.setRoomId(null);
-                        this.roomProgramService.update(roomProgram);
-                    }
-                }
-
-                // 清除视频关联关系
-                List<Video> videoList = this.videoService.findObjBuLiveRoomId(dto.getId());
-                if(videoList.size() > 0){
-                    videoList.forEach((e)->{
-                        e.setLiveRoomId(null);
-                        this.videoService.update(e);
-                    });
-                }
-                return new Result(200, "Succesfully");
-            }else{
-                return new Result(500, "Delete Error");
-            }
-        }else{
-            return new Result(400, "Parameter error");
-        }
-    }
-
-    /**
      * 直播间修改
      * @param dto
      * @return
      */
-    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:CHANGE")
+//    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:CHANGE")
     @ApiOperation("直播间管理-修改")
     @RequestMapping("/manager/change")
     public Object managerChange(@RequestBody LiveRoomDto dto){
@@ -603,8 +530,8 @@ public class LiveRoomManagerController {
     @RequestMapping(value = "/manager/save")
     public Object managerSave(@RequestBody LiveRoom instance) {
         if (instance != null) {
-            LiveRoom liveRoom = this.liveRoomService.getObjById(instance.getId());
-            if(liveRoom != null){
+//            LiveRoom liveRoom = this.liveRoomService.getObjById(instance.getId());
+//            if(liveRoom != null){
                 Accessory accessory = this.accessoryService.getObjById(instance.getCover());
                 if(accessory != null){
                     instance.setCover(accessory.getId());
@@ -614,10 +541,53 @@ public class LiveRoomManagerController {
                 if(this.liveRoomService.save(instance)){
                     return ResponseUtil.ok();
                 }
-            }
-            return ResponseUtil.badArgument("未找到指定资源");
+//           }
+//            return ResponseUtil.badArgument("未找到指定资源");
         }
         return new Result(400,"Parameter Error");
+    }
+
+
+    /**
+     * 删除直播间
+     * @param
+     * @param
+     * @param
+     * @return
+     */
+//    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:DELETE")
+    @ApiOperation("直播间管理-删除")
+    @RequestMapping(value = "/manager/delete")
+    public Object managerDelete(@RequestBody LiveRoomDto dto){
+        if(dto.getId() != null || !dto.getId().equals("")){
+            int flag = this.liveRoomService.delete(dto.getId());
+            if(flag == 1){
+                // 清除直播关联关系 这里优化为批量更新
+                Map params = new HashMap();
+                params.put("roomId", dto.getId());
+                List<RoomProgram> roomPrograms = this.roomProgramService.findRoomProgramByLiveRoomId(params);
+                if(roomPrograms.size() > 0){
+                    for(RoomProgram roomProgram : roomPrograms){
+                        roomProgram.setRoomId(null);
+                        this.roomProgramService.update(roomProgram);
+                    }
+                }
+
+                // 清除视频关联关系
+                List<Video> videoList = this.videoService.findObjBuLiveRoomId(dto.getId());
+                if(videoList.size() > 0){
+                    videoList.forEach((e)->{
+                        e.setLiveRoomId(null);
+                        this.videoService.update(e);
+                    });
+                }
+                return new Result(200, "Succesfully");
+            }else{
+                return new Result(500, "Delete Error");
+            }
+        }else{
+            return new Result(400, "Parameter error");
+        }
     }
 
 }

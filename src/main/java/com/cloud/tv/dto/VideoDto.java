@@ -21,6 +21,8 @@ public class VideoDto extends PageDto<Video>{
 
     private String name;
 
+    private Integer addTime;
+
     private String beginTime;
 
     private String endTime;
@@ -63,5 +65,9 @@ public class VideoDto extends PageDto<Video>{
     private Integer genre;
 
     private Integer type; // 视频类型 0：录播 1：回放
+
+    private Integer isEnable;
+
+    private String lecturer;
 
 }

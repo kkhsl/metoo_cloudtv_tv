@@ -1,5 +1,6 @@
 package com.cloud.tv.core.mapper;
 
+import com.cloud.tv.dto.LiveRoomDto;
 import com.cloud.tv.entity.LiveRoom;
 import com.cloud.tv.vo.WebLiveRoomVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -46,10 +47,10 @@ public interface LiveRoomMapper {
 
     /**
      *分页查询
-     * @param params
+     * @param dto
      * @return
      */
-    public List<LiveRoom> query(Map<String, Object> params);
+    List<LiveRoom> query(LiveRoomDto dto);
 
     /**
      * 查询总数

@@ -90,18 +90,18 @@ public class UserServiceImpl implements IUserService {
                 user.setUserRole("普通用户");
             }
         }
-
         if(dto.getId() == null){
             try {
                 this.buyerMapper.insert(user);
                 // 创建直播间
                 Map params = new HashMap();
-                params.put("startRow", 0);
+                params.put("currentPage", 0);
                 params.put("pageSize", 1);
                 params.put("userId", user.getId());
-                List<LiveRoom> liveRoomList = this.liveRoomService.query(params);
+                List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
                if(liveRoomList.size() < 1){
                    LiveRoom instance = new LiveRoom();
+                   instance.setDeleteStatus(0);
                    instance.setAddTime(new Date());
                    instance.setTitle(user.getUsername() + "的直播间");
                    Date date = new Date();

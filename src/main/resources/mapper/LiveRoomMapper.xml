@@ -424,13 +424,19 @@
     </delete>
 
     <!--使用Limit实现分页-->
-    <select id="query" parameterType="map" resultMap="Base_Result_Map">
+    <select id="findObjByMap" parameterType="map" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
         FROM metoo_live_room mlr
         LEFT JOIN metoo_accessory ma ON ma.id = mlr.cover
         <where>
             <if test="deleteStatus != null">
                 AND mlr.deleteStatus = #{deleteStatus}
+            </if>
+            <if test = "title != null and title != ''">
+                AND mlr.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test = "isEnable != null">
+                AND mlr.isEnable = #{isEnable}
             </if>
             <if test="userId != null">
                 AND mlr.userId = #{userId, jdbcType=BIGINT}
@@ -444,19 +450,28 @@
         </where>
     </select>
 
-    <select id="findObjByMap" resultType="com.cloud.tv.entity.LiveRoom">
-        SELECT *
+    <select id="query" parameterType="com.cloud.tv.dto.LiveRoomDto" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
         FROM metoo_live_room mlr
+        LEFT JOIN metoo_accessory ma ON ma.id = mlr.cover
         <where>
-            <if test="bindCode">
-                AND bindCode = #{bindCode}
+            <if test="deleteStatus != null">
+                AND mlr.deleteStatus = #{deleteStatus}
             </if>
-            <if test="isEnable">
-                AND isEnable = #{isEnable}
+            <if test = "title != null and title != ''">
+                AND mlr.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test = "isEnable != null">
+                AND mlr.isEnable = #{isEnable}
+            </if>
+            <if test="userId != null">
+                AND mlr.userId = #{userId, jdbcType=BIGINT}
+            </if>
+            <if test = "id != null">
+                AND mlr.id = #{id}
             </if>
         </where>
     </select>
-
 
     <select id="getAccountByTotal" resultType="int">
         SELECT COUNT(1)

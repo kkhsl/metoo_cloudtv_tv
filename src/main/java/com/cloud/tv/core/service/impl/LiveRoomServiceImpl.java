@@ -1,7 +1,9 @@
 package com.cloud.tv.core.service.impl;
 
 import com.cloud.tv.core.mapper.LiveRoomMapper;
+import com.cloud.tv.dto.LiveRoomDto;
 import com.cloud.tv.entity.LiveRoom;
+import com.cloud.tv.entity.Video;
 import com.cloud.tv.vo.WebLiveRoomVo;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -99,9 +101,18 @@ public class LiveRoomServiceImpl implements ILiveRoomService {
     }
 
     @Override
-    public List<LiveRoom> query(Map<String, Object> params) {
-        return this.liveRoomMapper.query(params);
+    public List<LiveRoom> findObjByMap(Map<String, Object> params) {
+        Page<LiveRoom> page = PageHelper.startPage((Integer)params.get("currentPage"), (Integer)params.get("pageSize"));
+        return this.liveRoomMapper.findObjByMap(params);
     }
+
+    @Override
+    public Page<LiveRoom> query(LiveRoomDto dto) {
+        Page<LiveRoom> page = PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+        this.liveRoomMapper.query(dto);
+        return page;
+    }
+
 
     @Override
     public int findAccountByTotal() {
@@ -148,11 +159,6 @@ public class LiveRoomServiceImpl implements ILiveRoomService {
 //        System.out.println(page.isHasNextPage());
 
         return page;
-    }
-
-    @Override
-    public List<LiveRoom> findObjByMap(Map<String, Object> params) {
-        return this.liveRoomMapper.findObjByMap(params);
     }
 
     @Override

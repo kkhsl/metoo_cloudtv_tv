@@ -50,9 +50,9 @@ public class VideoServiceImpl implements IVideoService {
     }
 
     @Override
-    public Page<Video> findObjByReq(VideoReq req) {
-        Page<Video> page = PageHelper.startPage(req.getCurrentPage(), req.getPageSize());
-        this.videoMapper.findObjByReq(req);
+    public Page<Video> query(VideoDto dto) {
+        Page<Video> page = PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+        this.videoMapper.query(dto);
         return page;
     }
 
@@ -101,10 +101,10 @@ public class VideoServiceImpl implements IVideoService {
                         }
                     }*/
                     Map params = new HashMap();
-                    params.put("startRow", 0);
+                    params.put("currentPage", 0);
                     params.put("pageSize", 1);
                     params.put("userId", user.getId());
-                    List<LiveRoom> liveRoomList = this.liveRoomService.query(params);
+                    List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
                     if(liveRoomList.size() > 0){
                         video.setLiveRoomId(liveRoomList.get(0).getId());
                         video.setLiveRoom(liveRoomList.get(0));

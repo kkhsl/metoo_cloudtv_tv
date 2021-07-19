@@ -85,12 +85,12 @@ public class VideoManagerController {
             params.put("orderType", "DESC");
         }
         params.put("deleteStatus", "deleteStatus");
-        List<Video> videos = this.videoService.findObjByMap(params);
-        data.put("obj", videos);
+        List<Video> videoList = this.videoService.findObjByMap(params);
+        data.put("obj", videoList);
         SysConfig configs = this.configService.findSysConfigList();
         data.put("domain", configs.getDomain());
         data.put("currentPage", dto.getCurrentPage());
-        data.put("pageSize", videos.size());
+        data.put("pageSize", videoList.size());
         return new Result(200,"Successfully", data);
     }
 
@@ -416,9 +416,9 @@ public class VideoManagerController {
     @RequiresPermissions("ADMIN:VIDEO:WAITREVIW")
     @ApiOperation("待审核视频")
     @PostMapping("/waitReview")
-    public Object waitReview(@RequestBody(required = false) VideoReq req){
-        req.setGenre(0);
-        Page<Video> page = this.videoService.findObjByReq(req);
+    public Object waitReview(@RequestBody(required = false) VideoDto dto){
+        dto.setGenre(0);
+        Page<Video> page = this.videoService.query(dto);
         if(page.getResult().size() > 0){
             Map data = new HashMap();
             data.put("obj", new PageInfo<RoomProgram>(page));
@@ -428,4 +428,22 @@ public class VideoManagerController {
         }
         return ResponseUtil.ok();
     }
+
+    @ApiOperation("视频管理-列表")
+    @RequestMapping("/manager/list")
+    public Object managerList(@RequestBody(required = false) VideoDto dto){
+        if(dto == null){
+            dto = new VideoDto();
+        }
+        Page<Video> page = this.videoService.query(dto);
+        if(page.getResult().size() > 0){
+            Map map = new HashMap();
+            map.put("obj", new PageInfo(page));
+            SysConfig configs = this.configService.findSysConfigList();
+            map.put("domain", configs.getDomain());
+            return ResponseUtil.ok(map);
+        }
+        return ResponseUtil.ok();
+    }
+
 }

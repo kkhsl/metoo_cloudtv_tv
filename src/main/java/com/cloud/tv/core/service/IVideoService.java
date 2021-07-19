@@ -17,7 +17,9 @@ public interface IVideoService {
 
     List<Video> findObjByMap(Map params);
 
-    Page<Video> findObjByReq(VideoReq req);
+//    Page<Video> findObjByReq(VideoDto dto);
+
+    Page<Video> query(VideoDto dto);
 
     List<Video> findObjBuLiveRoomId(Long id);
 

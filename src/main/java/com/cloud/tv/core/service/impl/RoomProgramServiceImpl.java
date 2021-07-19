@@ -160,7 +160,7 @@ public class RoomProgramServiceImpl implements IRoomProgramService {
         params.put("startRow", 0);
         params.put("pageSize", 1);
         params.put("userId", user.getId());
-        List<LiveRoom> liveRoomList = this.liveRoomService.query(params);
+        List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if(liveRoomList.size() > 0){
             obj.setRoomId(liveRoomList.get(0).getId());
         }
