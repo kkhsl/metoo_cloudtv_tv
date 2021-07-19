@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
-
-/**
- * 333
- */
+// Stash 1
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
