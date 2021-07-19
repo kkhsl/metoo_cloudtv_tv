@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
-// Stash 5
-// Stash 5
+// Stash 6
+// Stash 7
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
