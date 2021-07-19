@@ -13,24 +13,11 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  *
  * <p>
  *     Description: Springboot启动类，springBoot整合Mybatis、Shiro
-       测试合并3
+       测试合并2
  * </p>
 /*
- *//*
-
-@SpringBootApplication
-public class SpringbootShiroApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(SpringbootShiroApplication.class, args);
-    }
-
-}
-*/
-
-/**
- * 使用war包的方式部署项目
  */
+
 @SpringBootApplication // 申明让spring boot自动给程序进行必要的配置 == @Configuration ，@EnableAutoConfiguration 和 @ComponentScan
 @ServletComponentScan(basePackages ={ "com.hkk.cloudtv.filter"})//只用注解配置时，需要扫描包
 // @ComponentScan("")// 等价：<context:component-scan base-package="com.metoo" /> 组件扫描
