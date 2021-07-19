@@ -13,7 +13,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  *
  * <p>
  *     Description: Springboot启动类，springBoot整合Mybatis、Shiro
-       测试合并2
+       测试合并3
  * </p>
 /*
  *//*
