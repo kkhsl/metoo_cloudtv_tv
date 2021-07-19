@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c7129296-6358-46eb-8bbd-e741bfc9fc80" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/cloud/tv/vo/WebLiveRoomVo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cloud/tv/vo/WebLiveRoomVo.java" afterDir="false" />
-    </list>
+    <list default="true" id="c7129296-6358-46eb-8bbd-e741bfc9fc80" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,13 +16,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="java" value="19" />
-          <entry key="txt" value="6" />
+          <entry key="txt" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JAVA" value="19" />
-          <entry key="PLAIN_TEXT" value="6" />
+          <entry key="PLAIN_TEXT" value="11" />
         </counts>
       </usages-collector>
     </session>
@@ -47,8 +44,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/cloud/tv/vo/WebLiveRoomVo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="63">
-              <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+            <state relative-caret-position="413">
+              <caret line="24" column="34" lean-forward="true" selection-start-line="24" selection-start-column="34" selection-end-line="24" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -122,8 +119,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5875">
-              <caret line="235" column="19" selection-start-line="235" selection-start-column="19" selection-end-line="235" selection-end-column="19" />
+            <state relative-caret-position="5925">
+              <caret line="237" column="19" selection-start-line="237" selection-start-column="19" selection-end-line="237" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -240,7 +237,7 @@
     <property name="RequestMappingsPanelOrder1" value="1" />
     <property name="RequestMappingsPanelWidth0" value="75" />
     <property name="RequestMappingsPanelWidth1" value="75" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1626704446303" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1626704980442" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -305,24 +302,23 @@
       <option name="project" value="LOCAL" />
       <updated>1626704418724</updated>
     </task>
-    <task id="LOCAL-00003" summary="测试推送">
-      <created>1626685679416</created>
+    <task id="LOCAL-00003" summary="333,333">
+      <created>1626704454184</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1626685679416</updated>
+      <updated>1626704454184</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2927000" />
+    <option name="totallyTimeSpent" value="3471000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4889336" visible="true" weight="0.35924932" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4889336" visible="true" weight="0.35924932" />
       <window_info id="Structure" order="1" sideWeight="0.5110664" side_tool="true" weight="0.30294907" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -339,7 +335,7 @@
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49865952" weight="0.32765958" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49865952" weight="0.32765958" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.4256032" side_tool="true" visible="true" weight="0.26666668" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="9" sideWeight="0.4256032" side_tool="true" visible="true" weight="0.26666668" />
       <window_info anchor="bottom" id="Version Control" order="10" sideWeight="0.5743968" visible="true" weight="0.26666668" />
       <window_info anchor="bottom" id="Spring" order="11" sideWeight="0.49865952" weight="0.32765958" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.5522788" weight="0.28936172" />
@@ -366,7 +362,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="111" />
     <MESSAGE value="333" />
-    <option name="LAST_COMMIT_MESSAGE" value="333" />
+    <MESSAGE value="333,333" />
+    <option name="LAST_COMMIT_MESSAGE" value="333,333" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/java/com/cloud/tv/SpringbootShiroApplication.java">
@@ -378,8 +375,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/cloud/tv/vo/WebLiveRoomVo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="63">
-          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+        <state relative-caret-position="413">
+          <caret line="24" column="34" lean-forward="true" selection-start-line="24" selection-start-column="34" selection-end-line="24" selection-end-column="34" />
         </state>
       </provider>
     </entry>
