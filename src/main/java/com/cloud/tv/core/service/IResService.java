@@ -1,9 +1,10 @@
 package com.cloud.tv.core.service;
 
-import com.cloud.tv.dto.PermissionDto;
+import com.cloud.tv.dto.ResDto;
 import com.cloud.tv.entity.Res;
 import com.github.pagehelper.Page;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +24,21 @@ public interface IResService {
      */
     Res findObjById(Long id);
 
+    Res findObjByName(String name);
+
     Res findResUnitRoleByResId(Long id);
 
-    Page<Res> query(Map<String, Integer> params);
+    Page<Res> query(ResDto dto);
+
+    List<Res> findPermissionByJoin(Map map);
+
+    List<Res> findPermissionByMap(Map map);
 
     List<Res> findResByResIds(List<Integer> ids);
 
-    boolean save(PermissionDto instance);
+    Collection<String> findPermissionByUserId(Long id);
+
+    boolean save(ResDto instance);
 
     boolean delete(Long id);
 

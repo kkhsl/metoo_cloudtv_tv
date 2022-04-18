@@ -18,12 +18,7 @@
         <result property="url" column="mr_url"></result>
         <result property="component" column="mr_component"></result>
         <result property="sequence" column="mr_sequence"></result>
-        <association property="roleGroup" column="rg_id" javaType="com.cloud.tv.entity.RoleGroup">
-            <id property="id" column="mrg_id" jdbcType="BIGINT"></id>
-            <result property="name" column="mrg_name"></result>
-            <result property="sequence" column="mrg_sequence"></result>
-            <result property="type" column="mrg_type"></result>
-        </association>
+        <result property="info" column="mr_info"></result>
         <collection property="res_ids" ofType="java.lang.Long">
             <id column="res_id" property="res_ids"></id>
         </collection>
@@ -40,35 +35,46 @@
           WHERE id=#{id}
       </select>
 
-    <select id="selectByPrimaryUpdae" parameterType="Long" resultMap="Unit_Role_Map">
-
-        SELECT mr.id mr_id, mr.addTime mr_addTime, mr.name mr_name,
-        mr.roleCode mr_roleCode, mr.url mr_url,mr.component mr_component,
-        mr.sequence mr_sequence,
-        mrg.id mrg_id, mrg.name mrg_name,
-        res.id res_id, res.name res_name
-        FROM metoo_role mr
-        LEFT JOIN metoo_role_group mrg on mr.rg_id=mrg.id
-        LEFT JOIN metoo_role_res mrr ON mrr.role_id = mr.id
-        LEFT JOIN metoo_res res ON res.id = mrr.res_id
-        WHERE mr.type="ADMIN"
-        AND  mr.id= #{id}
-        ORDER BY mr.addTime
-        DESC
+    <select id="findRoleByName" parameterType="java.lang.String" resultType="com.cloud.tv.entity.Role">
+          SELECT *
+          FROM metoo_role
+          WHERE name=#{name}
       </select>
 
-    <select id="query" parameterType="map" resultMap="Unit_Role_Map">
-        SELECT mr.id mr_id, mr.addTime mr_addTime, mr.name mr_name, mr.roleCode mr_roleCode, mr.url mr_url,
-            mr.component mr_component, mr.sequence mr_sequence,
+
+
+    <!--
+
             mrg.id mrg_id, mrg.name mrg_name,
+  /*      LEFT JOIN metoo_role_group mrg on mr.rg_id=mrg.id*/-->
+    <select id="selectByPrimaryUpdae" parameterType="Long" resultMap="Unit_Role_Map">
+        SELECT mr.id mr_id, mr.addTime mr_addTime, mr.name mr_name,
+            mr.roleCode mr_roleCode, mr.url mr_url,mr.component mr_component,
+            mr.sequence mr_querysequence, mr.info mr_info,
             res.id res_id, res.name res_name
         FROM metoo_role mr
-            LEFT JOIN metoo_role_group mrg on mr.rg_id=mrg.id
+        LEFT JOIN metoo_role_res mrr ON mrr.role_id = mr.id
+        LEFT JOIN metoo_res res ON res.id = mrr.res_id
+        where mr.id= #{id}
+      </select>
+
+    <select id="query" parameterType="com.cloud.tv.dto.RoleDto" resultType="com.cloud.tv.entity.Role">
+        SELECT *
+        FROM metoo_role mr
+        WHERE
+        mr.deleteStatus = 0
+        ORDER BY mr.sequence DESC
+    </select>
+
+    <select id="findObjByMap" parameterType="map" resultMap="Unit_Role_Map">
+        SELECT mr.id mr_id, mr.addTime mr_addTime, mr.name mr_name, mr.roleCode mr_roleCode, mr.url mr_url,
+            mr.component mr_component, mr.sequence mr_sequence, res.id res_id,
+            res.name res_name
+        FROM metoo_role mr
             LEFT JOIN metoo_role_res mrr ON mrr.role_id = mr.id
             LEFT JOIN metoo_res res ON res.id = mrr.res_id
-        WHERE mr.type=#{type}
-        ORDER BY mr.sequence
-        DESC
+            WHERE mr.deleteStatus = 0
+        ORDER BY mr.sequence DESC, mr.addTime DESC
     </select>
 
     <resultMap id="roleDtoMap" type="com.cloud.tv.vo.RoleVo">
@@ -85,20 +91,6 @@
 
     </resultMap>
 
-    <select id="queryVo" parameterType="map" resultMap="roleDtoMap">
-        SELECT mr.id mr_id, mr.addTime mr_addTime, mr.name mr_name, mr.roleCode mr_roleCode,
-               mr.url mr_url,
-               mr.component mr_component,
-               mrg.id mrg_id, mrg.name mrg_name,
-               res.id res_id, res.name res_name
-        FROM metoo_role mr
-            LEFT JOIN metoo_role_group mrg on mr.rg_id=mrg.id
-            LEFT JOIN metoo_role_res mrr ON mrr.role_id = mr.id
-            LEFT JOIN metoo_res res ON res.id = mrr.res_id
-        WHERE mr.type= 'ADMIN'
-        ORDER BY mr.addTime
-        DESC
-    </select>
 
     <select id="findRoleByType" parameterType="java.lang.String" resultType="com.cloud.tv.entity.Role">
         SELECT *
@@ -110,12 +102,6 @@
         mr.id mr_id, mr.addTime mr_addTime, mr.deleteStatus mr_deleteStatus, mr.name mr_name, mr.roleCode mr_roleCode,
          mr.type mr_type, mr.info mr_info, mrg.id mrg_id, mrg.name mrg_name, mrg.sequence mrg_sequence, mrg.type mrg_type
     </sql>
-
-    <select id="countBy" parameterType="java.lang.String" resultType="java.lang.Integer">
-        SELECT COUNT(*)
-        FROM metoo_role mr
-        WHERE mr.roleCode=#{roleCode}
-    </select>
 
     <!--根据用户id查询所有角色 嵌套插叙-->
      <select id="findRoleByUserId" parameterType="Long" resultType="com.cloud.tv.entity.Role">

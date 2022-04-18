@@ -28,7 +28,7 @@ public class RoleGroupManagerController {
     @Autowired
     private IRoleService roleService;
 
-    @RequiresPermissions("ADMIN:ROLEGROUP:LIST")
+//    @RequiresPermissions("ADMIN:ROLEGROUP:LIST")
     @ApiOperation("角色组列表")
     @PostMapping("/list")
     public Object list(@RequestBody RoleGroupDto dto){
@@ -71,7 +71,7 @@ public class RoleGroupManagerController {
         return ResponseUtil.query(data);
     }
 
-    @RequiresPermissions("ADMIN:ROLEGROUP:ADD")
+//    @RequiresPermissions("ADMIN:ROLEGROUP:ADD")
     @ApiOperation("角色组添加")
     @GetMapping("/add")
     public Object add(){
@@ -80,7 +80,7 @@ public class RoleGroupManagerController {
         return ResponseUtil.ok(roles);
 }
 
-    @RequiresPermissions("ADMIN:ROLEGROUP:UPDATE")
+//    @RequiresPermissions("ADMIN:ROLEGROUP:UPDATE")
     @ApiOperation("角色组更新")
     @PostMapping("/update")
     public Object update(@RequestBody RoleGroupReq req){
@@ -91,7 +91,7 @@ public class RoleGroupManagerController {
         return ResponseUtil.badArgument();
     }
 
-    @RequiresPermissions("ADMIN:ROLEGROUP:SAVE")
+//    @RequiresPermissions("ADMIN:ROLEGROUP:SAVE")
     @ApiOperation("角色组保存")
     @PostMapping("/save")
     public Object save(@RequestBody  RoleGroupDto dto){
@@ -111,7 +111,7 @@ public class RoleGroupManagerController {
         return ResponseUtil.error();
     }
 
-    @RequiresPermissions("ADMIN:ROLEGROUP:DELETE")
+//    @RequiresPermissions("ADMIN:ROLEGROUP:DELETE")
     @ApiOperation("角色组删除")
     @RequestMapping("/delete")
     public Object delete(@RequestBody RoleGroupDto dto){

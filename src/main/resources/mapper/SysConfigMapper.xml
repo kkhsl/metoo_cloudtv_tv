@@ -29,12 +29,14 @@
             <if test = "domain != null">
                 `domain` =#{domain},
             </if>
-        </set>
-        <where>
-            <if test=" id != null">
-                id=#{id}
+            <if test=" videoAudit != null">
+                videoAudit = #{videoAudit},
             </if>
-        </where>
+            <if test=" appId != null">
+                appId = #{appId}
+            </if>
+        </set>
+        where id=#{id}
     </update>
 
 </mapper>

@@ -56,7 +56,7 @@ public interface LiveRoomMapper {
      * 查询总数
      * @return
      */
-    public int getAccountByTotal();
+    int getAccountByTotal();
 
     int change(String isEnable);
 

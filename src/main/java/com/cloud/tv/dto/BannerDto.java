@@ -34,4 +34,5 @@ public class BannerDto extends PageDto<Banner> {
     @ApiModelProperty("轮播图附件ID")
     private Long accessoryId;
 
+
 }

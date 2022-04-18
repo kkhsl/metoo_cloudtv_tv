@@ -32,10 +32,8 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, addTime, deleteStatus, username, password, sex, age
+        id, addTime, deleteStatus, username, password, sex, age, userRole
     </sql>
-
-
 
     <insert id="insert" parameterType="com.cloud.tv.entity.User" keyProperty="id" useGeneratedKeys="true">
         insert into metoo_user
@@ -55,7 +53,7 @@
             <if test="salt != null">
                 salt,
             </if>
-            <if test="userRole != null and userRole != ''">
+            <if test="userRole != null">
                 userRole,
             </if>
             <if test="age != null">
@@ -81,7 +79,7 @@
             <if test="salt != null and salt != ''">
                 #{salt},
             </if>
-            <if test="userRole != null and userRole != ''">
+            <if test="userRole != null">
                 #{userRole},
             </if>
             <if test="age != null">
@@ -107,7 +105,7 @@
         WHERE
         username=#{username}
         AND
-        deleteStatus = 0
+        deleteStatus >= 0
     </select>
 
     <sql id="Unit_Column_List">
@@ -125,11 +123,11 @@
 
     </select>
 
-    <select id="selectAll" parameterType="map" resultType="com.cloud.tv.vo.UserVo">
+    <select id="query" parameterType="com.cloud.tv.dto.UserDto" resultType="com.cloud.tv.vo.UserVo">
         SELECT <include refid="Base_Column_List"/>
         FROM metoo_user mu
         WHERE
-        mu.deleteStatus = #{deleteStatus}
+        mu.deleteStatus = 0
         ORDER BY mu.addTime
         DESC
     </select>
@@ -166,7 +164,7 @@
             <if test = "salt != null">
                 salt=#{salt},
             </if>
-            <if test="userRole != null and userRole != ''">
+            <if test="userRole != null">
                 userRole=#{userRole},
             </if>
             <if test="deleteStatus != null">

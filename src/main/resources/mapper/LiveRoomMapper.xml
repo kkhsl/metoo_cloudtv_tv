@@ -131,14 +131,11 @@
           ON mrpgc.mrp_id=mlr.roomProgramId
          LEFT JOIN metoo_accessory ma ON ma.id=mlr.cover
             <where>
-                <if test="deleteStatus">
-                    AND mlr.deleteStatus = 0
-                </if>
                 <if test = "mrp_status != null">
                     AND mrpgc.mrp_status = #{mrp_status}
                 </if>
                 <if test = "isEnable != null">
-                    AND mlr.isEnable = isEnable
+                    AND mlr.isEnable = #{isEnable}
                 </if>
                 <if test="grade != null and grade.length > 0 ">
                     AND mrpgc.mg_id IN
@@ -152,6 +149,7 @@
                         #{item}
                     </foreach>
                 </if>
+                AND mlr.deleteStatus = 0
             </where>
             <if test = "orderBy != null and orderBy != ''">
                 ORDER BY ${orderBy}
@@ -447,6 +445,9 @@
             <if test = "id != null">
                 AND mlr.id = #{id}
             </if>
+            <if test = "bindCode != null">
+                AND mlr.bindCode = #{bindCode}
+            </if>
         </where>
     </select>
 
@@ -455,9 +456,6 @@
         FROM metoo_live_room mlr
         LEFT JOIN metoo_accessory ma ON ma.id = mlr.cover
         <where>
-            <if test="deleteStatus != null">
-                AND mlr.deleteStatus = #{deleteStatus}
-            </if>
             <if test = "title != null and title != ''">
                 AND mlr.title LIKE CONCAT('%', #{title}, '%')
             </if>
@@ -470,6 +468,7 @@
             <if test = "id != null">
                 AND mlr.id = #{id}
             </if>
+            AND mlr.deleteStatus = 0
         </where>
     </select>
 

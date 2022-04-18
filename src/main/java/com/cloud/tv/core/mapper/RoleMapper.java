@@ -1,5 +1,6 @@
 package com.cloud.tv.core.mapper;
 
+import com.cloud.tv.dto.RoleDto;
 import com.cloud.tv.entity.Role;
 import com.cloud.tv.vo.RoleVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,6 +17,8 @@ public interface RoleMapper {
      * @return
      */
     Role findRoleById(Long id);
+
+    Role findRoleByName(String name);
 
     Role selectByPrimaryUpdae(Long id);
 
@@ -67,16 +70,9 @@ public interface RoleMapper {
      * 根据角色类型查询角色， 目前只有一种角色，默认使用“ADMIN”
      * @return
      */
-    List<Role> query(Map params);
+    List<Role> query(RoleDto dto);
 
-    List<RoleVo> queryVo(Map params);
-
-    /**
-     * 根据角色名称查询角色
-     * @param name
-     * @return
-     */
-    int countBy(String name);
+    List<Role> findObjByMap(Map params);
 
     int insert(Role instance);
 

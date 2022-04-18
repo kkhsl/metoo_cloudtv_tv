@@ -1,8 +1,18 @@
 package com.cloud.tv.config.shiro;
 
-import com.cloud.tv.core.shiro.filter.MyAccessControlFilter;
+import com.cloud.tv.core.config.filter.MyAccessControlFilter;
+import com.cloud.tv.core.jwt.util.JwtCredentialsMatcher;
+import com.cloud.tv.core.jwt.util.MultiRealmAuthenticator;
+import com.cloud.tv.filter.JwtFilter;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.AuthenticationStrategy;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
+import org.apache.shiro.mgt.SessionStorageEvaluator;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
@@ -13,9 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -35,7 +43,9 @@ import java.util.Map;
 @Configuration
 public class ShiroConfig {
 
+
     // 创建ShiroFilter  //负责拦截所有请求
+    // 配置访问资源所需要的权限
     @Bean
     public ShiroFilterFactoryBean getShiroFilterFactoryBean(DefaultWebSecurityManager defaultWebSecurityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
@@ -45,9 +55,11 @@ public class ShiroConfig {
 
         /**
          * 添加自定义拦截器，重写user认证方式，处理session超时问题
+         *  添加 jwt 专用过滤器，拦截除 /login 和 /logout 外的请求
          */
         HashMap<String, Filter> myFilters = new HashMap<>(16);
-        myFilters.put("rmb", new MyAccessControlFilter());
+        myFilters.put("mac", new MyAccessControlFilter());
+        myFilters.put("jwt_filter", new JwtFilter());
         shiroFilterFactoryBean.setFilters(myFilters);
 
         // 2,配置系统受限资源
@@ -67,17 +79,20 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/admin/auth/403", "anon");
         filterChainDefinitionMap.put("/admin/auth/404", "anon");
         filterChainDefinitionMap.put("/rtmp/**", "anon");
-        filterChainDefinitionMap.put("/jwt/**", "anon");
 
-        filterChainDefinitionMap.put("/**", "rmb");
-        //filterChainDefinitionMap.put("/buyer/**", "authc");
+        filterChainDefinitionMap.put("/jwt/**", "jwt_filter,anon");
+
+//        filterChainDefinitionMap.put("/admin/**", "mac");
+        //filterChainDefinitionMap.put("/buyer/**", "authc" );
         filterChainDefinitionMap.put("/admin/**", "authc");
+        filterChainDefinitionMap.put("/monitor/**", "authc");
 
         // 放行静态资源
         filterChainDefinitionMap.put("/static/**", "anon");
         filterChainDefinitionMap.put("/css/**", "anon");
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/upload/**", "anon");
+        filterChainDefinitionMap.put("/hls/**", "anon");
 
         //shiroFilterFactoryBean.setLoginUrl("/login.jsp");
         //shiroFilterFactoryBean.setLoginUrl("/buyer/login");
@@ -89,23 +104,46 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setLoginUrl("/admin/auth/401");
         shiroFilterFactoryBean.setUnauthorizedUrl("/admin/auth/403");
 
-
         // 3，配置系统公共资源
         return shiroFilterFactoryBean;
 
     }
 
-    // 创建安全管理器 web环境中配置webSecurity
+    /**
+     * 配置 ModularRealmAuthenticator
+     */
     @Bean
-    public DefaultWebSecurityManager getDefaultWevSecurityManager(Realm realm) {
+    public ModularRealmAuthenticator authenticator() {
+        ModularRealmAuthenticator authenticator = new MultiRealmAuthenticator();
+        // 设置多 Realm的认证策略，默认 AtLeastOneSuccessfulStrategy
+        AuthenticationStrategy strategy = new FirstSuccessfulStrategy();
+        authenticator.setAuthenticationStrategy(strategy);
+        return authenticator;
+    }
+
+    // 创建安全管理器 web环境中配置webSecurity
+    // getDefaultWevSecurityManager(Realm realm)
+    @Bean
+    public DefaultWebSecurityManager getDefaultWevSecurityManager() {
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
 
         // 1, 给安全管理器设置Realm
-        defaultWebSecurityManager.setRealm(realm);
+//        defaultWebSecurityManager.setRealm(realm);
+        // 1，给安全管理器设置Realms
+        List<Realm> realms = new ArrayList<Realm>();
+        realms.add(jwtRealm());
+        realms.add(getRealm());
+        defaultWebSecurityManager.setRealms(realms);
         // 2，给安全管理器设置SessionManager
         defaultWebSecurityManager.setSessionManager(getDefaultWebSessionManager());
         // 3，给安全管理器设置RememberMeManager
         defaultWebSecurityManager.setRememberMeManager(rememberMeManager());
+
+        // 3.关闭shiro自带的session
+        DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator());
+        defaultWebSecurityManager.setSubjectDAO(subjectDAO);
+
         return defaultWebSecurityManager;
 
     }
@@ -120,6 +158,17 @@ public class ShiroConfig {
         defaultWebSessionManager.setSessionIdCookieEnabled(true);
         return defaultWebSessionManager;
     }
+
+    /**
+     * 禁用session, 不保存用户登录状态。保证每次请求都重新认证
+     */
+    @Bean
+    protected SessionStorageEvaluator sessionStorageEvaluator() {
+        DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        return sessionStorageEvaluator;
+    }
+
 
     /**
      * 　　id：就是session id；
@@ -142,12 +191,12 @@ public class ShiroConfig {
     public SimpleCookie rememberMeCookie(){
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
         // 只能通过http访问cookie，js不能
-        // 保证该系统不会受到跨域的脚本操作攻击
+        // XSS:保证该系统不会受到跨域的脚本操作攻击
         simpleCookie.setHttpOnly(true);
         simpleCookie.setPath("/");
         //simpleCookie.setName("simpleCookie");
         //<!-- 记住我cookie生效时间30天 ,单位秒;如果设置为-1标识浏览器关闭就失效 -->
-        simpleCookie.setMaxAge(5000); // 2678400
+        simpleCookie.setMaxAge(-1); // 5000   2678400
         return simpleCookie;
     }
 
@@ -171,8 +220,9 @@ public class ShiroConfig {
         MyRealm myRealm = new MyRealm();
         // 设置Realm使用hash凭证匹配器; 问：Realm 不设置hash凭证器会出现什么
         HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-
+        // 设置加密算法 SHA-1、md5
         hashedCredentialsMatcher.setHashAlgorithmName("md5");
+        // 设置加密次数
         hashedCredentialsMatcher.setHashIterations(1024);
 
         myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
@@ -192,5 +242,20 @@ public class ShiroConfig {
         return myRealm;
     }
 
+    /**
+     * Jwt配置，需实现Realm接口
+     * @return
+     */
+    @Bean
+    public JwtRealm jwtRealm(){
+        JwtRealm jwtRealm = new JwtRealm();
+        // 设置加密算法
+        CredentialsMatcher credentialsMatcher = new JwtCredentialsMatcher();
+        // 设置加密次数
+        jwtRealm.setCredentialsMatcher(credentialsMatcher);
+        return jwtRealm;
+
+
+    }
 
 }

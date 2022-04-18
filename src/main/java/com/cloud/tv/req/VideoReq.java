@@ -18,6 +18,8 @@ public class VideoReq extends PageDto<Video> {
 
     private Long id;
 
+    private String name;
+
     private Integer[] grade;
 
     private Integer[] course;

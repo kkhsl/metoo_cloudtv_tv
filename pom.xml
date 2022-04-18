@@ -8,16 +8,17 @@
         <version>2.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.hkk.shiro</groupId>
-    <artifactId>springboot_shiro</artifactId>
+
+    <groupId>com.cloud.tv</groupId>
+    <artifactId>metoo_cloud_tv</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot_shiro</name>
+    <packaging>war</packaging>
+
+    <name>metoo_cloud_tv</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
-
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -34,25 +35,27 @@
 
         <!--1，Tomcat-->
         <!--内置tomcat--><!--使用war包运行项目 一处内置tomcat 添加-->
-              <dependency>
+         <!--     <dependency>
                   <groupId>org.springframework.boot</groupId>
                   <artifactId>spring-boot-starter-tomcat</artifactId>
-                  <scope>provided</scope>
-              </dependency>
+                  <scope>provided</scope>·
+              </dependency>-->
         <!--2，-->
         <!--因配置外部TOMCAT 而配置-->
-        <dependency>
+<!--        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <!--3，-->
+<!--
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
+-->
 
 
         <dependency>
@@ -87,21 +90,7 @@
             <version>1.2</version>
         </dependency>
 
-        <!--引入shiro整合SpringBoot依赖-->
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-spring-boot-starter</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-
-        <!--Mybatis-->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.2</version>
-        </dependency>
-
-        <!--Mybatis-Plug-->
+        <!--Mybatis-Pspringboot_shiro.warlug-->
         <!-- <dependency>
              <groupId>com.baomidou</groupId>
              <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -118,10 +107,10 @@
 
         <!--druid alibaba数据源依赖-->
         <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>druid</artifactId>
-        <version>1.0.9</version>
-    </dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.0.9</version>
+        </dependency>
 
         <!--Lombok项目是一个Java库，它会自动插入编辑器和构建工具中，Lombok提供了一组有用的注释，用来消除Java类中的大量样板代码-->
         <dependency>
@@ -131,11 +120,18 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--Mybatis-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+
+        <!--引入shiro整合SpringBoot依赖-->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring-boot-starter</artifactId>
+            <version>1.5.3</version>
         </dependency>
 
         <!--引入Shiro and EhCache-->
@@ -157,18 +153,13 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <dependency>
+
+  <!--      <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>RELEASE</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
+        </dependency>-->
         <!--SpringBoot 热部署-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -199,7 +190,6 @@
             <version>2.9.2</version>
         </dependency>
 
-
         <!-- 引入Spring Boot 内嵌的Tomcat对jsp的解析包-->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
@@ -226,7 +216,7 @@
             <artifactId>junit</artifactId>
         </dependency>
 
-        <!-- webSocket 开始-->
+        <!-- webSocket start-->
         <dependency>
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
@@ -240,7 +230,7 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- webSocket 结束-->
+        <!-- webSocket end-->
 
         <!-- Begin joda-time -->
         <dependency>
@@ -284,10 +274,15 @@
     <!--Profile 多环境开发-->
     <build>
         <!--修改打包后项目名称-->
-        <finalName>CloudTV</finalName>
+        <finalName>cloudTv</finalName>
 
         <plugins>
             <!--springboot编译打包插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -306,7 +301,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <warName>springboot_shiro</warName>
+                    <warName>metoo_cloud_tv</warName>
                 </configuration>
             </plugin>
 
@@ -314,7 +309,6 @@
 
         <!--xml文件不能编译到.class文件夹下，mybatis 的mapper文件也编译到class下-->
         <resources>
-
             <resource>
                 <directory>src/main/java</directory>
                 <includes>

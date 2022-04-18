@@ -1,9 +1,11 @@
 package com.cloud.tv.core.mapper;
 
+import com.cloud.tv.dto.UserDto;
 import com.cloud.tv.entity.User;
 import com.cloud.tv.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,7 @@ public interface BuyerMapper {
 
     User selectPrimaryKey(Long id);
 
-    List<UserVo> selectAll(Map params);
+    List<UserVo> query(UserDto dto);
 
     /**
      * 根据用户ID查询用户、角色组、角色信息
@@ -51,4 +53,5 @@ public interface BuyerMapper {
      * @return
      */
     int delete(Long id);
+
 }

@@ -8,10 +8,7 @@ import com.cloud.tv.entity.User;
 import com.cloud.tv.core.service.IRegisterService;
 import com.cloud.tv.core.service.IResService;
 import com.cloud.tv.core.service.IRoleService;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -29,6 +26,7 @@ import java.util.List;
  *
  * <p>
  *     Description: 自定义Realm
+ *     同时开启身份验证和权限验证，需要继承AuthorizingRealm
  * </p>
  *
  *         for(Role role : roles){
@@ -38,7 +36,7 @@ import java.util.List;
  *                 }
  * <p>
  *     authen: hkk
- * </p>
+ * </p>MultiRealmAuthenticator
  */
 public class MyRealm extends AuthorizingRealm {
 
@@ -47,6 +45,43 @@ public class MyRealm extends AuthorizingRealm {
     @Autowired
     private IResService resService;
 
+    /**
+     * 限定这个 Realm 只处理 UsernamePasswordToken
+     */
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof UsernamePasswordToken;}
+
+
+    // 认证
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        String username = (String) authenticationToken.getPrincipal();
+        IRegisterService registerService = (IRegisterService) ApplicationContextUtils.getBean("registerService");
+
+        User user = registerService.findByUsername(username);
+        if(!ObjectUtils.isEmpty(user)){
+            if(username.equals(user.getUsername())){
+              /* Collection sessions = sess
+                    if(username.equals(loginUsername)){  //这里的username也就是当前登录的username
+                        session.setTimeout(0);  //这里就把session清除，ionDAO.getActiveSessions();
+                for(Session scession: sessions){
+                    String loginUsername = String.valueOf(session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY));//获得session中已经登录用户的名字
+
+                    }
+                }*/
+                /**
+                 * 将获取到的用户信息封装成AuthticationInfo对象返回，此处封装成SimpleAuthticationInfo对象
+                 * 参数一：认证的实体信息，可以时从数据库中查询得到的实体类或用户名
+                 * 参数二：查询获得的登陆密码
+                 * 参数三：盐值
+                 * 参数四：当前Realm对象的名称，直接调用父类的getName()方法即可
+                 */
+                return new SimpleAuthenticationInfo(user, user.getPassword(),  new MyByteSource(user.getSalt()), this.getName());
+            }
+        }
+        return null;
+    }
     // 授权
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -79,7 +114,6 @@ public class MyRealm extends AuthorizingRealm {
 
                 for(Role role : roles){
                     simpleAuthorizationInfo.addRole(role.getRoleCode());
-                    System.out.println("roleCode_test : "  + role.getRoleCode());
                     // simpleAuthorizationInfo.addRole(role.getType());
                     //System.out.println(role.getName());
                     //simpleAuthorizationInfo.addStringPermission("BUYER:*:*");
@@ -111,27 +145,5 @@ public class MyRealm extends AuthorizingRealm {
         }
         return null;
     }
-    // 认证
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        String username = (String) authenticationToken.getPrincipal();
-        IRegisterService registerService = (IRegisterService) ApplicationContextUtils.getBean("registerService");
 
-        User user = registerService.findByUsername(username);
-        if(!ObjectUtils.isEmpty(user)){
-            if(username.equals(user.getUsername())){
-              /* Collection sessions = sessionDAO.getActiveSessions();
-                for(Session scession: sessions){
-                    String loginUsername = String.valueOf(session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY));//获得session中已经登录用户的名字
-
-                    if(username.equals(loginUsername)){  //这里的username也就是当前登录的username
-                        session.setTimeout(0);  //这里就把session清除，
-                    }
-                }*/
-                return new SimpleAuthenticationInfo(user, user.getPassword(),  new MyByteSource(user.getSalt()), this.getName());
-            }
-        }
-
-        return null;
-    }
 }

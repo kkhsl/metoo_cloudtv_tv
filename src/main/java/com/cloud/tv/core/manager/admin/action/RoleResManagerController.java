@@ -19,7 +19,7 @@ public class RoleResManagerController {
     @Autowired
     private IRoleResService roleResService;
 
-    @RequiresPermissions("ADMIN:ROLEPERMISSION:SETSYSRIGHTS")
+//    @RequiresPermissions("ADMIN:ROLEPERMISSION:SETSYSRIGHTS")
     @ApiOperation("角色分配权限")
     @PostMapping("/SetSysRights")
     public Object SetSysRights(Long role_id, String res_id){

@@ -3,7 +3,9 @@ package com.cloud.tv.core.mapper;
 import com.cloud.tv.entity.Res;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ResMapper {
@@ -15,6 +17,13 @@ public interface ResMapper {
      */
     List<Res> findResByRoleId(Long id);
 
+    Res findObjByName(String name);
+
+    List<Res> query();
+
+    List<Res> findPermissionByMap(Map map);
+
+    List<Res> findPermissionByJoin(Map map);
 
     Res  findResUnitRoleByResId(Long id);
 
@@ -25,11 +34,9 @@ public interface ResMapper {
      */
     Res selectPrimaryById(Long id);
 
-
-
-    List<Res> findResByAll();
-
     List<Res> findResByResIds(List<Integer> ids);
+
+    Collection<String> findPermissionByUserId(Long id);
 
     /**
      * 保存一个系统资源

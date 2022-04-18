@@ -128,7 +128,6 @@ public class RoomProgram extends IdEntity {
     /**
      * 偷个懒，这里不做联表查询
      */
-
     @ApiModelProperty("年级ID")
     private Long grade_id;
 
@@ -141,4 +140,9 @@ public class RoomProgram extends IdEntity {
     @ApiModelProperty("科目名称")
     private String courseName;
 
+    @ApiModelProperty("时间戳")
+    private String timestamp;
+
+//    @ApiModelProperty("数字签名、记录每次直播记录；直播间ID+直播ID+用户ID+学校number")
+//    private String sign;
 }

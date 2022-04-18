@@ -70,4 +70,11 @@ public class VideoDto extends PageDto<Video>{
 
     private String lecturer;
 
+    @ApiModelProperty("封面附件ID")
+    private Long photoId;
+
+    @ApiModelProperty("视频附件ID")
+    private Long videoId;
+
+
 }

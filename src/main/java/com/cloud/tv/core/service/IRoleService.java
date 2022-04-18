@@ -3,6 +3,7 @@ package com.cloud.tv.core.service;
 import com.cloud.tv.dto.RoleDto;
 import com.cloud.tv.entity.Role;
 import com.cloud.tv.vo.RoleVo;
+import com.github.pagehelper.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,9 @@ public interface IRoleService {
      */
     Role findRoleById(Long id);
 
-    List<Role> findRoleByType(String type);
+    Role findObjByName(String name);
 
-    boolean countBy(String name);
+    List<Role> findRoleByType(String type);
 
     /**
      *根据用户id查询用所有角色信息
@@ -39,9 +40,9 @@ public interface IRoleService {
 
     Object update(RoleDto instance);
 
-    List<Role> query(Map params);
+    Page<Role> query(RoleDto dto);
 
-    List<RoleVo> queryRole(Map params);
+    List<Role> findObjByMap(Map params);
 
     boolean delete(Long id);
 

@@ -23,14 +23,14 @@ public class SysconfigManagerController {
     @Autowired
     private ILiveRoomService liveRoomService;
 
-    @RequiresPermissions("ADMIN:SYSCONFIG:LIST")
+    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
     @RequestMapping(value = "/list")
     public Object sysConfig(){
         SysConfig sysconfigList = this.sysConfigService.findSysConfigList();
         return sysconfigList;
     }
 
-    @RequiresPermissions("ADMIN:SYSCONFIG:UPDATE")
+    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
     @ApiOperation("系统配置更新")
     @RequestMapping("/update")
     public Object baseConfig(@RequestBody(required = false) SysConfig dto){

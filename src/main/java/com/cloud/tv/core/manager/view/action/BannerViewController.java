@@ -30,11 +30,9 @@ public class BannerViewController {
         params.put("display", 1);
         List<Banner> bannerList = this.bannerService.findObjByMap(params);
         if(bannerList.size() > 0){
-            Map map = new HashMap();
-            map.put("obj", bannerList);
-            SysConfig configs = this.configService.findSysConfigList();
-            map.put("domain", configs.getDomain());
-            return ResponseUtil.ok(map);
+            Map data = new HashMap();
+            data.put("obj", bannerList);
+            return ResponseUtil.ok(data);
         }
         return ResponseUtil.ok();
     }

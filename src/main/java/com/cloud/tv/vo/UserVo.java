@@ -44,6 +44,9 @@ public class UserVo {
     @ApiModelProperty("用户性别")
     private String type;
 
+    @ApiModelProperty("用户角色")
+    private String userRole;
+
     @ApiModelProperty("角色ID集合")
     private List<Long> roleIds = new ArrayList<Long>();
 

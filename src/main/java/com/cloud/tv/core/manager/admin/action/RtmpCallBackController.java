@@ -68,13 +68,12 @@ import java.util.*;
  * =======key: type
  * </p>
  */
+
 @Api("OBS回调方法")
 @RestController
 @RequestMapping("/rtmp")
 public class RtmpCallBackController {
 
-    @Autowired
-    private IRoomProgramService roomProgramService;
     @Autowired
     private ILiveRoomService liveRoomService;
 
@@ -101,6 +100,8 @@ public class RtmpCallBackController {
         Map params = new HashMap();
         params.put("bindCode", bindCode);
         params.put("isEnable", 1);
+        params.put("currentPage", 1);
+        params.put("pageSize", 1);
         List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if (liveRoomList.size() > 0) {
             LiveRoom liveRoom = liveRoomList.get(0);
@@ -123,7 +124,7 @@ public class RtmpCallBackController {
     @RequestMapping("/on_done")
     public void on_done(HttpServletRequest request) {
         try {
-            Thread.sleep(15);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -147,6 +148,8 @@ public class RtmpCallBackController {
         Map params = new HashMap();
         params.put("bindCode", bindCode);
         params.put("isEnable", 1);
+        params.put("currentPage", 1);
+        params.put("pageSize", 1);
         List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if (liveRoomList.size() > 0) {
             LiveRoom liveRoom = liveRoomList.get(0);

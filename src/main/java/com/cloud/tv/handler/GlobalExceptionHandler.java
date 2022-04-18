@@ -1,6 +1,8 @@
 package com.cloud.tv.handler;
 
 import com.cloud.tv.core.utils.ResponseUtil;
+import com.cloud.tv.vo.Result;
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.FileNotFoundException;
 
 /**
@@ -80,5 +83,17 @@ public class GlobalExceptionHandler {
         logger.debug("ExpiredSessionException", e);
         return ResponseUtil.expired();
     }
+
+    // 捕捉shiro的异常
+//    @ExceptionHandler(ShiroException.class)
+//    public Object handleShiroException(ShiroException e) {
+//        return ResponseUtil.badArgument(401, e.getMessage());
+//    }
+//
+//    // 捕捉其他所有异常
+//    @ExceptionHandler(Exception.class)
+//    public Object globalException(HttpServletRequest request, Throwable ex) {
+//        return ResponseUtil.badArgument(401, ex.getMessage());
+//    }
 
 }

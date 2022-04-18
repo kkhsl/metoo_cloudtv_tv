@@ -1,9 +1,8 @@
 package com.cloud.tv.core.service.impl;
 
 import com.cloud.tv.core.mapper.ResMapper;
-import com.cloud.tv.dto.PermissionDto;
+import com.cloud.tv.dto.ResDto;
 import com.cloud.tv.entity.Res;
-import com.cloud.tv.entity.Role;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.cloud.tv.core.service.IResService;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +23,6 @@ public class ResServiceImpl implements IResService {
 
     @Autowired
     private ResMapper resMapper;
-    @Autowired
-    private IRoleService roleService;
 
     @Override
     public List<Res> findResByRoleId(Long id) {
@@ -37,15 +35,30 @@ public class ResServiceImpl implements IResService {
     }
 
     @Override
+    public Res findObjByName(String name) {
+        return this.resMapper.findObjByName(name);
+    }
+
+    @Override
     public Res findResUnitRoleByResId(Long id) {
         return this.resMapper.findResUnitRoleByResId(id);
     }
 
     @Override
-    public Page<Res> query(Map<String, Integer> params) {
-             Page<Res> page= PageHelper.startPage(params.get("currentPage"), params.get("pageSize"));
-            this.resMapper.findResByAll();
+    public Page<Res> query(ResDto dto) {
+            Page<Res> page= PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+            this.resMapper.query();
             return page;
+    }
+
+    @Override
+    public List<Res> findPermissionByJoin(Map map) {
+        return this.resMapper.findPermissionByJoin(map);
+    }
+
+    @Override
+    public List<Res> findPermissionByMap(Map map) {
+        return this.resMapper.findPermissionByMap(map);
     }
 
     @Override
@@ -54,18 +67,26 @@ public class ResServiceImpl implements IResService {
     }
 
     @Override
-    public boolean save(PermissionDto instance) {
+    public Collection<String> findPermissionByUserId(Long id) {
+        return this.resMapper.findPermissionByUserId(id);
+    }
+
+    @Override
+    public boolean save(ResDto dto) {
         Res obj = null;
-        if(instance.getId() == null){
+        if(dto.getId() == null){
             obj = new Res();
             obj.setAddTime(new Date());
         }else{
-            obj = this.resMapper.selectPrimaryById(instance.getId());
+            obj = this.resMapper.selectPrimaryById(dto.getId());
         }
-        Role role =  this.roleService.findRoleById(instance.getRole_id());
-        obj.setRole(role);
         if(obj != null){
-            BeanUtils.copyProperties(instance, obj);
+            BeanUtils.copyProperties(dto, obj);
+            Res res = this.resMapper.selectPrimaryById(dto.getParentId());
+            if(res != null){
+                obj.setParentId(res.getId());
+                obj.setParentName(res.getName());
+            }
             obj.setType("URL");
             if(obj.getId() == null ){
                 try {

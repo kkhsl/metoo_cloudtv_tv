@@ -56,7 +56,7 @@ public class BannerServiceImpl implements IBannerService {
         }else{
             banner = this.bannerMapper.findObjById(dto.getId());
         }
-        Accessory accessory = this.accessoryService.getObjById(banner.getAccessoryId());
+        Accessory accessory = this.accessoryService.getObjById(dto.getAccessoryId());
         if(accessory != null){
             banner.setAccessoryId(accessory.getId());
             // 可以记录附件Path，避免联表查询时CONCAT()拼接

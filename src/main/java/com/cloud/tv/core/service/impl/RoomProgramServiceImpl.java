@@ -119,8 +119,7 @@ public class RoomProgramServiceImpl implements IRoomProgramService {
     public boolean save(RoomProgramDto instance) {
         User user = ShiroUserHolder.currentUser();
         // boolean flag = user.getUserRole() == null ? false : user.getUserRole().equals("ADMIN");
-        boolean flag = user.getUserRole().equals("ADMIN");
-        instance.setType(flag ? 1 : 0);
+
         if(StringUtils.isEmpty(instance.getUserName())){
             instance.setUserId(user.getId());
             instance.setUserName(user.getUsername());
@@ -157,7 +156,7 @@ public class RoomProgramServiceImpl implements IRoomProgramService {
         }*/
 
         Map params = new HashMap();
-        params.put("startRow", 0);
+        params.put("currentPage", 0);
         params.put("pageSize", 1);
         params.put("userId", user.getId());
         List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);

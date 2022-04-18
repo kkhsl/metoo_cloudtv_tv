@@ -8,13 +8,10 @@ import com.cloud.tv.entity.*;
 import com.cloud.tv.req.VideoReq;
 import com.cloud.tv.vo.Result;
 import com.github.pagehelper.Page;
-import com.cloud.tv.core.service.*;
-import com.cloud.tv.entity.*;
-import com.cloud.tv.core.service.*;
 import com.cloud.tv.core.utils.ResponseUtil;
-import com.cloud.tv.entity.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +27,6 @@ import java.util.*;
 public class VideoManagerController {
 
     @Autowired
-    private ISysConfigService sysConfigService;
-    @Autowired
     private IVideoService videoService;
     @Autowired
     private IAccessoryService accessoryService;
@@ -46,7 +41,8 @@ public class VideoManagerController {
     @Autowired
     private ILiveRoomService liveRoomService;
 
-    @RequiresPermissions("ADMIN:VIDEO:LIST")
+//    @RequiresPermissions("ADMIN:VIDEO:LIST")
+    /*@RequiresPermissions("LK:VIDEO")
     @ApiOperation("视频列表")
     @PostMapping("/list")
     public Object list(@RequestBody(required=false) VideoDto dto){
@@ -61,9 +57,9 @@ public class VideoManagerController {
         Map params = new HashMap();
         params.put("pageSize", dto.getPageSize());
         params.put("currentPage", dto.getCurrentPage());
-        Long userId = null;
+     *//*    Long userId = null;
         Integer genre = null;
-        if(!user.getUserRole().equals("SUPPER")){
+       if(!user.getUserRole().equals("SUPPER")){
             // 控制类型参数只能为0：避免前端随意传参
             if(user.getUserRole().equals("ADMIN")){ // 只有管理员才可筛选所有用户直播
                 if(dto.getGenre() == null || dto.getGenre() != 0){
@@ -76,7 +72,8 @@ public class VideoManagerController {
             }
             params.put("userId", userId);
         }
-
+*//*
+        params.put("userId", user.getId());
         params.put("type", 0);
         if(dto.getOrderBy() == null){
             params.put("orderBy", "addTime");
@@ -85,16 +82,49 @@ public class VideoManagerController {
             params.put("orderType", "DESC");
         }
         params.put("deleteStatus", "deleteStatus");
-        List<Video> videoList = this.videoService.findObjByMap(params);
+        List<Video> videoList = this.videoService.query(params);
         data.put("obj", videoList);
-        SysConfig configs = this.configService.findSysConfigList();
-        data.put("domain", configs.getDomain());
         data.put("currentPage", dto.getCurrentPage());
         data.put("pageSize", videoList.size());
         return new Result(200,"Successfully", data);
     }
+*/
+    @RequiresPermissions("LK:VIDEO")
+    @ApiOperation("视频列表")
+    @PostMapping("/list")
+    public Object list(@RequestBody(required=false) VideoDto dto){
+        if(dto == null){
+            dto = new VideoDto();
+        }
+        User user = ShiroUserHolder.currentUser();
+        dto.setUserId(user.getId());
+        dto.setType(0);
+        Page<Video> page = this.videoService.query(dto);
+        if(page.getResult().size() > 0){
+            return ResponseUtil.ok(new PageInfo<Void>(page));
+        }
+        return  ResponseUtil.ok();
+    }
 
-    @RequiresPermissions("ADMIN:VIDEO:LIST")
+    @RequiresPermissions("LK:PLAYBACK")
+    @ApiOperation("回放列表")
+    @PostMapping("/playback/list")
+    public Object playback(@RequestBody(required=false) VideoDto dto){
+        if(dto == null){
+            dto = new VideoDto();
+        }
+        User user = ShiroUserHolder.currentUser();
+        dto.setUserId(user.getId());
+        dto.setType(1);
+        Page<Video> page = this.videoService.query(dto);
+        if(page.getResult().size() > 0){
+            return ResponseUtil.ok(new PageInfo<Void>(page));
+        }
+        return  ResponseUtil.ok();
+    }
+
+    //    @RequiresPermissions("ADMIN:VIDEO:LIST")
+    /*@RequiresPermissions("LK:PLAYBACK")
     @ApiOperation("回放列表")
     @PostMapping("/playback/list")
     public Object playback(@RequestBody(required=false) VideoDto dto){
@@ -111,7 +141,7 @@ public class VideoManagerController {
         params.put("currentPage", dto.getCurrentPage());
         Long userId = null;
         Integer genre = null;
-        if(!user.getUserRole().equals("SUPPER")){
+        *//*if(!user.getUserRole().equals("SUPPER")){
             // 控制类型参数只能为0：避免前端随意传参
             if(user.getUserRole().equals("ADMIN")){ // 只有管理员才可筛选所有用户直播
                 if(dto.getGenre() == null || dto.getGenre() != 0){
@@ -123,7 +153,8 @@ public class VideoManagerController {
                 userId = user.getId();
             }
             params.put("userId", userId);
-        }
+        }*//*
+        params.put("userId", user.getId());
         params.put("type", 1);
         if(dto.getOrderBy() == null){
             params.put("orderBy", "addTime");
@@ -131,15 +162,13 @@ public class VideoManagerController {
         if(dto.getOrderType() == null){
             params.put("orderType", "DESC");
         }
-        params.put("deleteStatus", "deleteStatus");
+        params.put("deleteStatus", 0);
         List<Video> videos = this.videoService.findObjByMap(params);
         data.put("obj", videos);
-        SysConfig configs = this.configService.findSysConfigList();
-        data.put("domain", configs.getDomain());
         data.put("currentPage", dto.getCurrentPage());
         data.put("pageSize", videos.size());
-        return new Result(200,"Successfully", data);
-    }
+        return ResponseUtil.ok(data);
+    }*/
 
   /*  @ApiOperation("视频保存")
     @PostMapping("/save")
@@ -177,7 +206,8 @@ public class VideoManagerController {
         return ResponseUtil.result(200, "保存成功");
     }*/
 
-    @RequiresPermissions("ADMIN:VIDEO:ADD")
+//    @RequiresPermissions("ADMIN:VIDEO:ADD")
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
     @ApiOperation("视频添加")
     @RequestMapping("/add")
     public Object add(){
@@ -216,17 +246,16 @@ public class VideoManagerController {
         return ResponseUtil.ok(data);
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:UPDATE")
+//    @RequiresPermissions("ADMIN:VIDEO:UPDATE")
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
     @ApiOperation("视频修改")
     @PostMapping("/update")
     public Object update(@RequestBody VideoDto videoDto){
         User user = ShiroUserHolder.currentUser();
         Map data = new HashMap();
-        SysConfig configs = this.configService.findSysConfigList();
-        data.put("domain", configs.getDomain());
         Video video = this.videoService.selectPrimaryById(videoDto.getId());
         if(video != null){
-            if(video.getGenre() == 1){
+            if(video.getType() == 1){
                 RoomProgram roomProgram = this.roomProgramService.findObjById(video.getRoomProgramId());
                 if(roomProgram != null){
                     video.setRoomProgram(roomProgram);
@@ -246,29 +275,17 @@ public class VideoManagerController {
             List<Grade> grades = this.gradeService.findBycondition(params);
             data.put("courseList", courseList);
             data.put("gradeList", grades);
-
-            // 所有直播节目
-            if(user.getUserRole().equals("SUPPER")){
-                user = null;
-            }
-/*            params.clear();
-            params.put("userId", user != null ? user.getId() : null);
-            params.put("startRow", 0);
-            params.put("pageSize", 15);
-            List<LiveRoom> liveRooms = this.liveRoomService.query(params);
-            data.put("liveRoomList", liveRooms);*/
-
         }
-        return new Result(200, "Successfully", data);
+        return ResponseUtil.ok(data);
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:SAVE")
-    @ApiOperation("视频添加")
-    @PostMapping("/save")
+//    @RequiresPermissions("ADMIN:VIDEO:SAVE")
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
+    @ApiOperation("视频保存")
+    @PostMapping("/save1")
     public Object save(VideoDto videodto,
                        @RequestParam(value = "file", required = false) MultipartFile file,
                        @RequestParam(value = "img", required = false) MultipartFile img){
-        SysConfig configs = this.configService.findSysConfigList();
         if(file != null && file.getSize() > 0){
             Accessory video = this.upload(file,1);
             videodto.setVideo(video);
@@ -277,6 +294,17 @@ public class VideoManagerController {
             Accessory photo = this.upload(img,0);
             videodto.setAccessory(photo);
         }
+        Result result = (Result) this.videoService.save(videodto);
+        if(result.getCode() != 200){
+            return result;
+        }
+        return ResponseUtil.result(200, "保存成功");
+    }
+
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
+    @ApiOperation("视频保存")
+    @PostMapping("/save")
+    public Object save1(@RequestBody VideoDto videodto){
         Result result = (Result) this.videoService.save(videodto);
         if(result.getCode() != 200){
             return result;
@@ -345,8 +373,9 @@ public class VideoManagerController {
         return null;
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:DELETE")
-    @ApiOperation("录播回放视频删除")
+//    @RequiresPermissions("ADMIN:VIDEO:DELETE")
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
+    @ApiOperation("录播回放/视频删除")
     @RequestMapping("/delete")
     public Object delete(@RequestBody VideoDto dto){
         boolean flag = this.videoService.delete(dto.getId());
@@ -356,33 +385,9 @@ public class VideoManagerController {
         return ResponseUtil.result(200, "Fail to delete");
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:AUDIT")
-    @ApiOperation("视频审核")
-    @PostMapping("/audit")
-    public Object audit(@RequestBody VideoDto dto){
-        if(dto != null){
-            Video video = this.videoService.getObjById(dto.getId());
-            User user = ShiroUserHolder.currentUser();
-
-            if(video != null && video.getGenre() == 0){
-                if(dto.getStatus() > 1 || dto.getStatus() < -1){
-                    return ResponseUtil.badArgument("禁止恶意篡改参数");
-                }
-                dto.setLiveRoomId(video.getLiveRoomId());
-                if( this.videoService.update(dto)){
-                    return ResponseUtil.ok();
-                }else{
-                    return ResponseUtil.error();
-                }
-            }
-
-            return ResponseUtil.badArgument("未找到指定资源");
-        }
-        return ResponseUtil.badArgument("未找到指定资源");
-    }
-
-    @RequiresPermissions("ADMIN:VIDEO:CHANGE")
-    @ApiOperation("直播修改")
+//    @RequiresPermissions("ADMIN:VIDEO:CHANGE")
+    @RequiresPermissions(value = {"LK:VIDEO", "LK:PLAYBACK"}, logical = Logical.OR)
+    @ApiOperation("视频修改")
     @PutMapping("/change")
     public Object chenge(@RequestBody VideoReq req){
         if(req.getId() != null){
@@ -395,7 +400,8 @@ public class VideoManagerController {
         return ResponseUtil.badArgument();
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:APPLY")
+//    @RequiresPermissions("ADMIN:VIDEO:APPLY")
+    @RequiresPermissions(value = {"LK:VIDEO:MANAGER", "LK:PLAYBACK:MANAGER"}, logical = Logical.OR)
     @ApiOperation("重新提交审核")
     @PutMapping("/apply")
     public Object apply(@RequestBody VideoReq req){
@@ -413,20 +419,44 @@ public class VideoManagerController {
         return ResponseUtil.badArgument();
     }
 
-    @RequiresPermissions("ADMIN:VIDEO:WAITREVIW")
+//    @RequiresPermissions("ADMIN:VIDEO:WAITREVIW")
+    @RequiresPermissions(value = {"LK:VIDEO:MANAGER"}, logical = Logical.OR)
     @ApiOperation("待审核视频")
     @PostMapping("/waitReview")
     public Object waitReview(@RequestBody(required = false) VideoDto dto){
-        dto.setGenre(0);
+//        dto.setGenre(0);
+        dto.setOrderBy("status");
+        dto.setOrderType("DESC");
         Page<Video> page = this.videoService.query(dto);
         if(page.getResult().size() > 0){
-            Map data = new HashMap();
-            data.put("obj", new PageInfo<RoomProgram>(page));
-            SysConfig config = this.sysConfigService.findSysConfigList();
-            data.put("domain", config.getDomain());
-            return  ResponseUtil.ok(data);
+            return  ResponseUtil.ok(new PageInfo<RoomProgram>(page));
         }
         return ResponseUtil.ok();
+    }
+
+
+    //    @RequiresPermissions("ADMIN:VIDEO:AUDIT")
+    @RequiresPermissions(value = {"LK:VIDEO:MANAGER"}, logical = Logical.OR)
+    @ApiOperation("视频审核")
+    @PostMapping("/audit")
+    public Object audit(@RequestBody VideoDto dto){
+        if(dto != null){
+            Video video = this.videoService.getObjById(dto.getId());
+            if(video != null){
+                if(dto.getStatus() > 1 || dto.getStatus() < -1){
+                    return ResponseUtil.badArgument("禁止恶意篡改参数");
+                }
+                dto.setLiveRoomId(video.getLiveRoomId());
+                if( this.videoService.update(dto)){
+                    return ResponseUtil.ok();
+                }else{
+                    return ResponseUtil.error();
+                }
+            }
+
+            return ResponseUtil.badArgument("未找到指定资源");
+        }
+        return ResponseUtil.badArgument("未找到指定资源");
     }
 
     @ApiOperation("视频管理-列表")
@@ -437,11 +467,7 @@ public class VideoManagerController {
         }
         Page<Video> page = this.videoService.query(dto);
         if(page.getResult().size() > 0){
-            Map map = new HashMap();
-            map.put("obj", new PageInfo(page));
-            SysConfig configs = this.configService.findSysConfigList();
-            map.put("domain", configs.getDomain());
-            return ResponseUtil.ok(map);
+            return ResponseUtil.ok(new PageInfo<Video>(page));
         }
         return ResponseUtil.ok();
     }

@@ -12,4 +12,5 @@ public interface IIndexService {
      * @return
      */
     List<MenuVo> findMenu(Long id);
+
 }

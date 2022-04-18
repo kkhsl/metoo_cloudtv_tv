@@ -10,6 +10,7 @@ import com.cloud.tv.vo.Result;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.cloud.tv.core.mapper.VideoMapper;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -38,6 +36,10 @@ public class VideoServiceImpl implements IVideoService {
     private ICourseService courseService;
     @Autowired
     private ILiveRoomService liveRoomService;
+    @Autowired
+    private IResService resService;
+    @Autowired
+    private IUserService userService;
 
     @Override
     public Video getObjById(Long id) {
@@ -118,19 +120,26 @@ public class VideoServiceImpl implements IVideoService {
                             return new Result(400, "Course params error");
                         }
                     }
-                    if(instance.getAccessory() != null){
-                        video.setAccessory(instance.getAccessory());
-                    }
-                    if(instance.getVideo() != null){
-                        video.setVideo(instance.getVideo());
-                    }
-
-                    if(user.getUserRole().equals("管理员")){
+                    // 视频审核
+                    SysConfig config = this.configService.findSysConfigList();
+                    if(config.getVideoAudit()==0){
                         video.setStatus(1);
-                        video.setGenre(1);
                     }else{
-                        video.setStatus(1);
-                        video.setGenre(0);
+                        video.setStatus(0);
+                        Collection<String> resList = this.resService.findPermissionByUserId(user.getId());
+                        if(resList.size() > 0){
+                            if(resList.contains("LK:VIDEO:MANAGER")){
+                                video.setStatus(1);
+                            }
+                        }
+                    }
+                    Accessory accessoryPhoto = this.accessoryService.getObjById(instance.getPhotoId());
+                    if(accessoryPhoto != null){
+                        video.setAccessory(accessoryPhoto);
+                    }
+                    Accessory accessoryVideo = this.accessoryService.getObjById(instance.getVideoId());
+                    if(accessoryVideo != null){
+                        video.setVideo(accessoryVideo);
                     }
                     video.setAddTime(new Date());
                     video.setBeginTime(instance.getBeginTime());

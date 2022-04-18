@@ -68,13 +68,14 @@ public class PlayBackTools {
             video.setEndTime(CommUtils.formatTime("yyyy-MM-dd HH:mm:ss", program.getEndTime()));
             video.setGrade(program.getGrade());
             video.setCourse(program.getCourse());
-            if(user.getUserRole().equals("管理员")){
+            // 视频审核
+            SysConfig sysConfigList = sysConfigService.findSysConfigList();
+            if(sysConfigList.getVideoAudit()==0){
                 video.setStatus(1);
-                video.setGenre(1);
             }else{
-                video.setStatus(1);
-                video.setGenre(0);
+                video.setStatus(0);
             }
+
             video.setDisplay(1);
             video.setType(1);
             video.setSequence(0);

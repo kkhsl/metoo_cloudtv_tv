@@ -4,6 +4,7 @@ import com.cloud.tv.core.manager.admin.tools.ShiroUserHolder;
 import com.cloud.tv.core.service.*;
 import com.cloud.tv.core.utils.CommUtils;
 import com.cloud.tv.core.utils.ResponseUtil;
+import com.cloud.tv.core.utils.query.PageInfo;
 import com.cloud.tv.dto.UserDto;
 import com.cloud.tv.entity.*;
 import com.cloud.tv.vo.UserVo;
@@ -12,6 +13,7 @@ import com.github.pagehelper.util.StringUtil;
 import com.cloud.tv.core.shiro.tools.SaltUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,65 +33,93 @@ public class UserManagerController {
     @Autowired
     private IRoleService roleService;
     @Autowired
-    private IRoleGroupService roleGroupService;
-    @Autowired
     private ILiveRoomService liveRoomService;
     @Autowired
     private IRoomProgramService roomProgramService;
     @Autowired
     private IVideoService videoService;
 
-    @RequiresPermissions("ADMIN:USER:LIST")
+    @RequestMapping("/get")
+    public Object get(){
+        return "get";
+    }
+
+    //    @RequiresPermissions("ADMIN:USER:LIST")
+//    @RequiresPermissions("LK:USER")
+    @RequiresPermissions(value = {"LK:USER:MANAGER"})
     @ApiOperation("用户列表")
     @PostMapping("/list")
     public Object list(@RequestBody UserDto dto){
-        Map map = new HashMap();
-        if(dto.getCurrentPage() == null || dto.getCurrentPage().equals("")){
-            dto.setCurrentPage(1);
-        }
-        if(dto.getPageSize() == null || dto.getPageSize().equals("")){
-            dto.setPageSize(15);
-        }
         Map params = new HashMap();
         params.put("deleteStatus", 0);
-        params.put("pageSize", dto.getPageSize());
-        params.put("pageSize", dto.getPageSize());
-        params.put("currentPage", (dto.getCurrentPage() ));
-        Page<UserVo> page = this.userService.query(params);
-        map.put("currentPage", page.getStartRow());
-        map.put("pageSize", page.getPageSize());
-        map.put("obj", page.getResult());
-        map.put("pages", page.getPages());
-        return ResponseUtil.ok(map);
+        Page<UserVo> page = this.userService.query(dto);
+        int i = 0;
+        if(page.getResult().size() > 0){
+            return ResponseUtil.ok(new PageInfo<Role>(page));
+        }
+        return ResponseUtil.ok();
     }
 
-    @RequiresPermissions("ADMIN:USER:ADD")
+//    @RequiresPermissions("ADMIN:USER:ADD")
+//    @RequiresPermissions("LK:USER:MANAGER")
     @ApiOperation("用户添加")
     @GetMapping("/add")
     public Object add(){
+        Map params = new HashMap();
+        params.put("currentPage", 0);
+        params.put("pageSize", 0);
+        List<Role> roleList = this.roleService.findObjByMap(params);
+        if(roleList.size() > 0){
+            Map data  = new HashMap();
+            data.put("roleList", roleList);
+            return ResponseUtil.ok(data);
+        }
+        return ResponseUtil.ok();
+    }
+   /* public Object add(){
         // 查询角色组列表/角色列表
         Map params = new HashMap();
         params.put("currentPage", 1);
         params.put("pageSize", 15);
-        List<RoleGroup> roleGroupList = this.roleGroupService.roleUnitGroup(params);
+       *//* List<RoleGroup> roleGroupList = this.roleGroupService.roleUnitGroup(params);
+       map.put("roleGroup", roleGroupList);*//*
         Map map  = new HashMap();
         map.put("currentPage", 1);
         map.put("pageSize", 15);
-        map.put("roleGroup", roleGroupList);
         return ResponseUtil.ok(map);
-    }
+    }*/
 
-    @RequiresPermissions("ADMIN:USER:UPDATE")
+//    @RequiresPermissions("ADMIN:USER:UPDATE")
+//    @RequiresPermissions(value = {"LK:USER", "LK:USER:MANAGER"})
     @ApiOperation("用户更新")
     @PostMapping("/update")
     public Object update(@RequestBody UserDto dto){
         User user = this.userService.findObjById(dto.getId());
         if(user != null){
+            Map data = new HashMap();
+            /*List<Role> userRoleList = this.roleService.findRoleByUserId(user.getId());
+            data.put("userRoleList",userRoleList);*/
+            UserVo obj = this.userService.findUserUpdate(user.getId());
+            data.put("obj", obj);
+            Map params = new HashMap();
+            params.put("currentPage", 0);
+            params.put("pageSize", 0);
+            List<Role> roleList = this.roleService.findObjByMap(params);
+            if(roleList.size() > 0){
+                data.put("roleList", roleList);
+            }
+            return ResponseUtil.ok(data);
+        }
+        return ResponseUtil.badArgument();
+    }
+    /*public Object update(@RequestBody UserDto dto){
+        User user = this.userService.findObjById(dto.getId());
+        if(user != null){
             Map map = new HashMap();
 
             // 根据用户ID查询角色
-          /*  List<Role> roleList = this.roleService.findRoleByUserId(user.getId());
-            map.put("roleList",roleList);*/
+          *//*  List<Role> roleList = this.roleService.findRoleByUserId(user.getId());
+            map.put("roleList",roleList);*//*
             Map params = new HashMap();
             params.put("currentPage", 1);
             params.put("pageSize", 15);
@@ -100,9 +130,10 @@ public class UserManagerController {
             return ResponseUtil.ok(map);
         }
         return ResponseUtil.badArgument();
-    }
+    }*/
 
-    @RequiresPermissions("ADMIN:USER:SAVE")
+//    @RequiresPermissions("ADMIN:USER:SAVE")
+//    @RequiresPermissions(value = {"LK:USER", "LK:USER:MANAGER"}, logical = Logical.OR)
     @ApiOperation("用户保存")
     @PostMapping("/save")
     public Object save(@RequestBody UserDto dto){
@@ -158,6 +189,7 @@ public class UserManagerController {
     }
 
 //    @RequiresPermissions("ADMIN:USER:SAVE")
+    @RequiresPermissions(value = {"LK:USER:MANAGER"})
     @ApiOperation("创建用户")
     @PostMapping("/create")
     public Object persionalSave(@RequestBody UserDto dto){
@@ -190,9 +222,6 @@ public class UserManagerController {
                     dto.setSalt(sale);
                 }
             }
-            if(StringUtils.isEmpty(dto.getType())){
-                return ResponseUtil.badArgument("请选择用户类型");
-            }
             if( this.userService.save(dto)){
                 return ResponseUtil.ok();
             }
@@ -202,7 +231,8 @@ public class UserManagerController {
      }
 
 
-    @RequiresPermissions("ADMIN:USER:DELETE")
+//    @RequiresPermissions("ADMIN:USER:DELETE")
+    @RequiresPermissions(value = {"LK:USER:MANAGER"})
     @ApiOperation("用户删除")
     @RequestMapping("/delete")
     public Object delete(@RequestBody UserDto dto){
@@ -212,6 +242,8 @@ public class UserManagerController {
             this.userService.update(user);
             // 清空用户直播间
             Map params = new HashMap();
+            params.put("pageSize", 0);
+            params.put("currentPage", 0);
             params.put("userId", user.getId());
             List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
             for(LiveRoom liveRoom : liveRoomList){
@@ -225,9 +257,11 @@ public class UserManagerController {
                 this.roomProgramService.update(roomProgram);
             }
             // 清空用户视频
+            params.clear();
             params.put("pageSize", 0);
             params.put("currentPage", 0);
-           List<Video> videoList = this.videoService.findObjByMap(params);
+            params.put("userId", user.getId());
+            List<Video> videoList = this.videoService.findObjByMap(params);
             for(Video video : videoList){
                 video.setDeleteStatus(-1);
                 this.videoService.update(video);
@@ -240,6 +274,7 @@ public class UserManagerController {
         return ResponseUtil.badArgument();
     }
 
+//    @RequiresPermissions(value = {"LK:USER"}) // 创建帐号应分配个人中心权限
     @ApiOperation("个人中心")
     @RequestMapping("/personal")
     public Object personal(){

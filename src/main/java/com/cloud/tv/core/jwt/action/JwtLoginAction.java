@@ -2,12 +2,14 @@ package com.cloud.tv.core.jwt.action;
 
 import com.cloud.tv.core.jwt.util.JwtUtil;
 import com.cloud.tv.core.service.IUserService;
+import com.cloud.tv.core.utils.ResponseUtil;
 import com.cloud.tv.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,6 +48,13 @@ public class JwtLoginAction {
 //        response.getWriter().print("TestResponse");
 
         return token;
+    }
+
+    @RequestMapping("/test/filter")
+    @ResponseBody
+    public Object test_filter(HttpServletRequest request, HttpServletResponse response){
+        response.setHeader("h","kk");
+        return ResponseUtil.ok();
     }
 
 

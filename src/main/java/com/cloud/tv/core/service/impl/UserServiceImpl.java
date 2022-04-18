@@ -67,11 +67,12 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Page<UserVo> query(Map params) {
-        Page<UserVo> page = PageHelper.startPage((Integer) params.get("currentPage"), (Integer) params.get("pageSize"));
-        List<UserVo> users = this.buyerMapper.selectAll(params);
+    public Page<UserVo> query(UserDto dto) {
+        Page<UserVo> page = PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+        this.buyerMapper.query(dto);
         return page;
     }
+
 
     @Override
     public boolean save(UserDto dto) {
@@ -83,13 +84,6 @@ public class UserServiceImpl implements IUserService {
             user = this.buyerMapper.selectPrimaryKey(dto.getId());
         }
         BeanUtils.copyProperties(dto, user);
-        if(dto.getType() != null){
-            if(dto.getType().equals("管理员")){
-                user.setUserRole("管理员");
-            }else{
-                user.setUserRole("普通用户");
-            }
-        }
         if(dto.getId() == null){
             try {
                 this.buyerMapper.insert(user);
@@ -109,13 +103,9 @@ public class UserServiceImpl implements IUserService {
                    String df = sdf.format(date);
                    String bindCode = df + CommUtils.randomString(6);// 推流码
                    instance.setBindCode(bindCode);
-
                    instance.setUser(user);
                    instance.setUserId(user.getId());
                    instance.setUsername(user.getUsername());
-                   if(user.getUserRole().equals("ADMIN")){
-                       instance.setType(1);
-                   }
                    instance.setIsEnable(1);
                    if(instance.getManager() == null || instance.getManager().equals("")){
                        instance.setManager(user.getUsername());
@@ -135,7 +125,7 @@ public class UserServiceImpl implements IUserService {
                    }
                    this.liveRoomMapper.save(instance);
                }
-
+                String roleName = "";
                 // 批量添加用户角色信息
                 if(dto.getRole_id() != null && dto.getRole_id().length > 0){
                     List<Integer> idList = Arrays.asList(dto.getRole_id());
@@ -146,26 +136,30 @@ public class UserServiceImpl implements IUserService {
                         userRole.setUser_id(user.getId());
                         userRole.setRole_id(role.getId());
                         userRoles.add(userRole);
+                        roleName += role.getName() + ",";
                     }
+                    roleName = roleName.substring(0,roleName.lastIndexOf(","));
+                    this.userRoleService.batchAddUserRole(userRoles);
+                }
                     try {
-                        this.userRoleService.batchAddUserRole(userRoles);
+                        user.setUserRole(roleName);
+                        this.buyerMapper.update(user);
                         return true;
                     } catch (Exception e) {
                         e.printStackTrace();
                         return false;
                     }
-                }
-                return true;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
         }else{
-            // 清除用户角色信息
             try {
+                String roleName = "";
+                // 清除用户角色信息
+                this.userRoleService.deleteUserByRoleId(user.getId());
                 // 批量添加用户角色信息
                 if(dto.getRole_id() != null && dto.getRole_id().length > 0){
-                    this.userRoleService.deleteUserByRoleId(user.getId());
                     List<Integer> idList = Arrays.asList(dto.getRole_id());
                     List<Role> roleList = this.roleService.findRoleByIdList(idList);
                     List<UserRole> userRoles = new ArrayList<UserRole>();
@@ -174,9 +168,12 @@ public class UserServiceImpl implements IUserService {
                         userRole.setUser_id(user.getId());
                         userRole.setRole_id(role.getId());
                         userRoles.add(userRole);
+                        roleName += role.getName() + ",";
                     }
+                    roleName = roleName.substring(0, roleName.lastIndexOf(","));
                     this.userRoleService.batchAddUserRole(userRoles);
                 }
+                user.setUserRole(roleName);
                 this.buyerMapper.update(user);
                 User currentUser = ShiroUserHolder.currentUser();
 

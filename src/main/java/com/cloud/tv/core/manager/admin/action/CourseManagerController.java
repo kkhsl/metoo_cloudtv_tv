@@ -1,8 +1,12 @@
 package com.cloud.tv.core.manager.admin.action;
 
+import com.cloud.tv.core.service.IRoomProgramService;
+import com.cloud.tv.core.service.IVideoService;
 import com.cloud.tv.core.utils.ResponseUtil;
 import com.cloud.tv.dto.CourseDto;
 import com.cloud.tv.entity.Course;
+import com.cloud.tv.entity.RoomProgram;
+import com.cloud.tv.entity.Video;
 import com.cloud.tv.req.CourseReq;
 import com.cloud.tv.vo.Result;
 import com.github.pagehelper.Page;
@@ -14,17 +18,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Api("科目管理")
+@RequiresPermissions("LK:COURSE:MANAGER")
 @RestController
 @RequestMapping("/admin/course")
 public class CourseManagerController {
 
     @Autowired
     private ICourseService courseService;
+    @Autowired
+    private IVideoService videoService;
+    @Autowired
+    private IRoomProgramService roomProgramService;
 
-    @RequiresPermissions("ADMIN:COURSE:LIST")
+//    @RequiresPermissions("ADMIN:COURSE:LIST")
     @ApiOperation("科目列表")
     @RequestMapping("/list")
     public Object list(@RequestBody(required = false) CourseDto dto){
@@ -48,7 +58,7 @@ public class CourseManagerController {
     }
 
 
-    @RequiresPermissions("ADMIN:COURSE:UPDATE")
+//    @RequiresPermissions("ADMIN:COURSE:UPDATE")
     @ApiOperation("科目修改")
     @PutMapping("/update")
     public Object update(@RequestBody CourseDto courseDto){
@@ -70,7 +80,7 @@ public class CourseManagerController {
             return ResponseUtil.result(500, "Fail to update");
         }*/
 
-    @RequiresPermissions("ADMIN:COURSE:SAVE")
+//    @RequiresPermissions("ADMIN:COURSE:SAVE")
     @PostMapping("/save")
     @ApiOperation("科目添加")
     public Object save(@RequestBody CourseDto courseDto){
@@ -80,19 +90,37 @@ public class CourseManagerController {
         return ResponseUtil.result(500, "Fail to create");
     }
 
-    @RequiresPermissions("ADMIN:COURSE:DELETE")
+//    @RequiresPermissions("ADMIN:COURSE:DELETE")
     @ApiOperation("科目删除")
     @DeleteMapping("/delete")
     public Object delete(Long id){
         Course course = this.courseService.getObjById(id);
-        if(course != null)
-            if(this.courseService.delete(id)){
-                return new Result(200, "Successfully");
+        if(course != null) {
+            // 清除关联项
+            Map map = new HashMap();
+            map.put("course_id", course.getId());
+            map.put("currentPage", 0);
+            map.put("pageSize", 0);
+            List<Video> videoList = this.videoService.findObjByMap(map);
+            for(Video video : videoList){
+                video.setCourse(null);
+                this.videoService.update(video);
             }
+            List<RoomProgram> roomProgramList = this.roomProgramService.findObjByCondition(map);
+
+            for(RoomProgram roomProgram : roomProgramList){
+                roomProgram.setCourse(null);
+                roomProgram.setCourseName(null);
+                this.roomProgramService.update(roomProgram);
+            }
+            if (this.courseService.delete(id)) {
+                return ResponseUtil.ok();
+            }
+        }
         return ResponseUtil.result(500, "Fail to delete");
     }
 
-    @RequiresPermissions("ADMIN:COURSE:CHANGE")
+//    @RequiresPermissions("ADMIN:COURSE:CHANGE")
     @ApiOperation("科目修改")
     @PutMapping("/change")
     public Object change(@RequestBody CourseReq req){

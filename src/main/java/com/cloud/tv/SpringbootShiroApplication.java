@@ -13,20 +13,16 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  *
  * <p>
  *     Description: Springboot启动类，springBoot整合Mybatis、Shiro
- *     // Stash 10
- *      // Stash 9
- * </p>
-/*
  */
 
 @SpringBootApplication // 申明让spring boot自动给程序进行必要的配置 == @Configuration ，@EnableAutoConfiguration 和 @ComponentScan
-@ServletComponentScan(basePackages ={ "com.hkk.cloudtv.filter"})//只用注解配置时，需要扫描包
+@ServletComponentScan(basePackages ={ "com.hkk.cloud.tv.filter"})//只用注解配置时，需要扫描包
 // @ComponentScan("")// 等价：<context:component-scan base-package="com.metoo" /> 组件扫描
 // @EnableAspectJAutoProxy(proxyTargetClass = true)
 //@EnableTransactionManagement// 事务
 public class SpringbootShiroApplication extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { 
         Long time=System.currentTimeMillis();
         SpringApplication.run(SpringbootShiroApplication.class);
         System.out.println("===应用启动耗时："+(System.currentTimeMillis()-time)+"===");

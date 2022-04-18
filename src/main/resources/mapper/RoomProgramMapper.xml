@@ -29,11 +29,18 @@
           <if test = "roomId != null">
             AND mrp.roomId = #{roomId}
           </if>
-          <if test = "roomName != null and roomName != ''">
-              AND mrp.roomName LIKE CONCAT('%', #{roomName}, '%')
+          <if test = "title != null and title != ''">
+              AND mrp.title LIKE CONCAT('%', #{title}, '%')
+          </if>
+          <if test = "title != null and title != ''">
+              AND mrp.roomTitle LIKE CONCAT('%', #{title}, '%')
+          </if>
+          <if test="userId != null">
+              AND userId = #{userId}
           </if>
           AND mrp.deleteStatus = 0
       </where>
+
     </select>
 
 
@@ -144,11 +151,11 @@
             <if test="courseName != null">
                 courseName,
             </if>
-            <if test="user != null">
-                userId,
-            </if>
             <if test="display != null">
                 display,
+            </if>
+            <if test="timestamp != null">
+                timestamp,
             </if>
         </trim>
         <trim prefix="VALUES (" suffixOverrides="," suffix=")">
@@ -201,22 +208,22 @@
                 #{isPlayback},
             </if>
             <if test="grade != null">
-                #{grade.id},
+                #{grade_id},
             </if>
             <if test="gradeName != null">
                 #{gradeName},
             </if>
             <if test="course != null">
-                #{course.id},
+                #{course_id},
             </if>
             <if test="courseName != null">
                 #{courseName},
             </if>
-            <if test="user != null">
-                #{user.id},
-            </if>
             <if test="display != null">
                 #{display},
+            </if>
+            <if test="timestamp != null">
+                #{timestamp},
             </if>
         </trim>
     </insert>
@@ -275,23 +282,23 @@
             <if test="isPlayback != null">
                 isPlayback = #{isPlayback},
             </if>
-            <if test="grade != null">
+            <if test="grade != ''">
                 grade_id = #{grade.id},
             </if>
-            <if test="gradeName != null">
+            <if test="gradeName != ''">
                 gradeName = #{gradeName},
             </if>
-            <if test="course != null">
+            <if test="course != ''">
                 course_id = #{course.id},
             </if>
-            <if test="courseName != null">
+            <if test="courseName != ''">
                 courseName = #{courseName},
-            </if>
-            <if test="user != null">
-                userId = #{user.id},
             </if>
             <if test="display != null">
                 display = #{display},
+            </if>
+            <if test="timestamp != null">
+                timestamp = #{timestamp},
             </if>
         </set>
         <where>
@@ -309,7 +316,7 @@
 
     <select id="condition" parameterType="map" resultType="com.cloud.tv.entity.RoomProgram">
         SELECT *
-        FROM metoo_room_program mrp
+        FROM metoo_room_program
         <where>
             <if test = "status != null">
                 AND status=#{status}
@@ -322,6 +329,12 @@
             </if>
             <if test = "userId != null">
                 AND userId=#{userId}
+            </if>
+            <if test = "course_id != null">
+                AND course_id=#{course_id}
+            </if>
+            <if test = "grade_id != null">
+                AND grade_id=#{grade_id}
             </if>
         </where>
     </select>

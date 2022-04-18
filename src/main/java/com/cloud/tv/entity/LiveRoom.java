@@ -127,4 +127,6 @@ public class LiveRoom extends IdEntity{
     @ApiModelProperty("直播间索引：可根据该值默认排序，权重越大越在前")
     private Integer sequence;
 
+
+
 }

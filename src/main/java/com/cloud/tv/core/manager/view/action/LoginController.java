@@ -1,5 +1,6 @@
 package com.cloud.tv.core.manager.view.action;
 
+import com.cloud.tv.core.jwt.util.JwtUtil;
 import com.cloud.tv.entity.User;
 import com.cloud.tv.core.service.IUserService;
 import com.cloud.tv.core.utils.CaptchaUtil;
@@ -120,9 +121,9 @@ public class LoginController{
         session.getStartTimestamp();
         if(captcha != null && !StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
             if(sessionCaptcha.toUpperCase().equals(captcha.toUpperCase())){
-                User user = (User) SecurityUtils.getSubject().getPrincipal();
                 boolean flag = true;// 当前用户是否已登录
-                if(user != null && !user.getUsername().equals("")){
+                if(subject.getPrincipal() != null){
+                    User user = (User) subject.getPrincipal();
                     if(user.getUsername().equals(username)){
                         flag = false;
                     }
@@ -134,8 +135,11 @@ public class LoginController{
                             token.setRememberMe(true);
                             // 或 UsernamePasswordToken token = new UsernamePasswordToken(username,password,true);
                         }
-                        subject.login(token);
+                        subject.login(token);// 进入ShiroRealm查询数据库获取用户信息
                         session.removeAttribute("captcha");
+                        // 登陆成功，签发Jwt Token
+                        String jwtToken = JwtUtil.sign(username, JwtUtil.SECRET);
+                        response.setHeader(JwtUtil.AUTH_HEADER, jwtToken);
                         return ResponseUtil.ok();
                         //  return "redirect:/index.jsp";
                     } catch (UnknownAccountException e) {
@@ -175,8 +179,10 @@ public class LoginController{
         String code = CaptchaUtil.getRandomCode();
         // 将验证码输入到session中，用来验证
         HttpSession session = request.getSession();
+
         session.setAttribute("captcha", code);
         this.removeAttrbute(session, "captcha");
+        System.out.println(session.getId());
         // 输出到web页面
         ImageIO.write(CaptchaUtil.genCaptcha(code), "jpg", response.getOutputStream());
     }
@@ -199,8 +205,7 @@ public class LoginController{
     @RequestMapping("/logout")
     public Object logout(){
         Subject subject = SecurityUtils.getSubject();
-        User obj = (User) subject.getPrincipal();
-        if(obj != null){
+        if(subject.getPrincipal() != null){
             subject.logout(); // 退出登录
             return ResponseUtil.ok();
         }else{

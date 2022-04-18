@@ -4,10 +4,13 @@ import com.cloud.tv.core.service.IResService;
 import com.cloud.tv.core.service.IRoleGroupService;
 import com.cloud.tv.core.service.IRoleService;
 import com.cloud.tv.core.utils.ResponseUtil;
+import com.cloud.tv.core.utils.query.PageInfo;
 import com.cloud.tv.dto.RoleDto;
+import com.cloud.tv.entity.LiveRoom;
 import com.cloud.tv.entity.Res;
 import com.cloud.tv.entity.Role;
 import com.cloud.tv.entity.RoleGroup;
+import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -26,44 +29,50 @@ public class RoleManagerController {
     @Autowired
     private IRoleService roleService;
     @Autowired
-    private IRoleGroupService roleGroupService;
-    @Autowired
     private IResService resService;
 
-//    @RequiresPermissions("ADMIN:ROLE:LIST")
+    @RequiresPermissions("LK:ROLE:MANAGER")
     @ApiOperation("角色列表")
     @RequestMapping("/list")
     public Object list(@RequestBody RoleDto dto){
-        Map params = new HashMap();
-        /*if(dto.getCurrentPage() == null || dto.getCurrentPage() < 1){
-            dto.setCurrentPage(1);
+        Map data = new HashMap();
+        Page<Role> page = this.roleService.query(dto);
+        if(page.getResult().size() > 0){
+            return  ResponseUtil.ok(new PageInfo<Role>(page));
         }
-        if(dto.getPageSize() == null || dto.getPageSize() < 1 ){
-            dto.setPageSize(15);
-        }*/
-        params.put("startRow", (dto.getCurrentPage() ));
-        params.put("pageSize", dto.getPageSize());
-        params.put("type", "ADMIN");
-        List<Role> roles = this.roleService.query(params);
-        params.put("obj", roles);
-        params.put("pageSize", roles.size());
-        return  ResponseUtil.ok(params);
+       return ResponseUtil.ok();
     }
 
-    @RequiresPermissions("ADMIN:ROLE:ADD")
+    @RequiresPermissions("LK:ROLE:MANAGER")
     @ApiOperation("角色添加")
     @GetMapping("/add")
     public Object add(){
+        Map data = new HashMap();
+    /*    List<RoleGroup> roleGroupList = this.roleGroupService.selectByPrimaryType("ADMIN");
+        map.put("roleGroupList", roleGroupList);
+        Map params = new HashMap();
+        params.put("currentPage", 1);
+        params.put("pageSize", 1000);
+        List<Res> resList = this.resService.findPermissionByMap(params);
+        map.put("resList", resList);*/
+        Map params = new HashMap();
+        params.put("currentPage", 0);
+        params.put("pageSize", 10000);
+        List<Res> ResList = this.resService.findPermissionByJoin(params);
+        data.put("obj", ResList);
+        return ResponseUtil.ok(data);
+    }
+  /*  public Object add(){
         Map map = new HashMap();
         List<RoleGroup> roleGroupList = this.roleGroupService.selectByPrimaryType("ADMIN");
         map.put("roleGroupList", roleGroupList);
         Map params = new HashMap();
         params.put("currentPage", 1);
         params.put("pageSize", 1000);
-        List<Role> resList = this.resService.query(params);
+        List<Res> resList = this.resService.findPermissionByMap(params);
         map.put("resList", resList);
         return ResponseUtil.ok(map);
-    }
+    }*/
 
    /* @ApiOperation("角色添加")
     @GetMapping("/add")
@@ -75,19 +84,26 @@ public class RoleManagerController {
         return ResponseUtil.ok();
     }*/
 
-    private Object validate(RoleDto role) {
-        String name = role.getName();
-        String code = role.getRoleCode();
-        if (code == null || name == null) {
-            return ResponseUtil.badArgument();
-        }
-        return null;
-    }
-
-    @RequiresPermissions("ADMIN:ROLE:UPDATE")
+    @RequiresPermissions("LK:ROLE:MANAGER")
     @ApiOperation("角色修改/回显")
     @PostMapping("/update")
-    public Object udpate(@RequestBody RoleDto dto){
+     public Object udpate(@RequestBody RoleDto dto){
+        Role role = this.roleService.findRoleById(dto.getId());
+        if(role != null){
+            Map data =  new HashMap();
+            data.put("obj", this.roleService.selectByPrimaryUpdae(dto.getId()));
+            // 是否改为idList
+           // data.put("roleResList", this.resService.findResByRoleId(role.getId()));
+            Map params = new HashMap();
+            params.put("currentPage", 0);
+            params.put("pageSize", 10000);
+            List<Res> resList = this.resService.findPermissionByJoin(params);
+            data.put("resList", resList);
+            return ResponseUtil.ok(data);
+        }
+        return ResponseUtil.badArgument();
+    }
+   /* public Object udpate(@RequestBody RoleDto dto){
         Role role = this.roleService.findRoleById(dto.getId());
         if(role != null){
             Map map =  new HashMap();
@@ -97,30 +113,40 @@ public class RoleManagerController {
             Map params = new HashMap();
             params.put("currentPage", 1);
             params.put("pageSize", 1000);
-            List<Res> resList = this.resService.query(params);
+            List<Res> resList = this.resService.findPermissionByMap(params);
             map.put("resList", resList);
             return ResponseUtil.ok(map);
         }
         return ResponseUtil.badArgument();
-    }
+    }*/
 
-    @RequiresPermissions("ADMIN:ROLE:SAVE")
+    @RequiresPermissions("LK:ROLE:MANAGER")
     @ApiOperation("角色保存")
     @PostMapping("/save")
-    public Object save(@RequestBody RoleDto roleDto){
-        Object error = validate(roleDto);
-        if(error != null){
-            return error;
-        }
-        if(roleDto.getId() == null){
-            if(this.roleService.countBy(roleDto.getRoleCode())){
-                return ResponseUtil.fail(400, "Role is exists");
+    public Object save(@RequestBody RoleDto dto){
+        if(dto.getName() != null){
+            Role role = this.roleService.findObjByName(dto.getName());
+            Role role2 = this.roleService.findRoleById(dto.getId());
+            boolean flag = true;
+            if(role != null){
+                flag = false;
+                if(role2 != null){
+                    if(!role.getName().equals(role2.getName())){
+                        flag =  false;
+                    }else{
+                        flag = true;
+                    }
+                }
             }
+
+            if(flag){
+                if(this.roleService.save(dto)){
+                    return ResponseUtil.ok();
+                }
+            }
+            return ResponseUtil.badArgument("角色已存在");
         }
-        if(this.roleService.save(roleDto)){
-            return ResponseUtil.ok();
-        }
-        return ResponseUtil.error();
+        return ResponseUtil.badArgument("请输入角色名称");
     }
 
     /*@ApiOperation("角色删除")
@@ -140,7 +166,7 @@ public class RoleManagerController {
         return ResponseUtil.badArgument();
     }*/
 
-    @RequiresPermissions("ADMIN:ROLE:DELETE")
+    @RequiresPermissions("LK:ROLE:MANAGER")
     @ApiOperation("角色删除")
     @RequestMapping("/delete")
     public Object delete(@RequestBody RoleDto dto){
@@ -155,7 +181,6 @@ public class RoleManagerController {
                 return ResponseUtil.ok();
             }
         }
-
         return ResponseUtil.delete();
     }
 }

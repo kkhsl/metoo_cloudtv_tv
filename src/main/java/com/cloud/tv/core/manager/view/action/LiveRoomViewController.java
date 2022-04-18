@@ -47,7 +47,7 @@ public class LiveRoomViewController {
     @ApiOperation("直播间列表")
     @RequestMapping("/list")
     public Object list(@RequestBody LiveRoomDto dto){
-        Map map = new HashMap();
+        Map data = new HashMap();
         if(dto.getCurrentPage() == null && dto.getCurrentPage() < 0){
             dto.setCurrentPage(1);
         }
@@ -71,21 +71,19 @@ public class LiveRoomViewController {
         params.put("deleteStatus", 0);
         Page<WebLiveRoomVo> page = this.liveRoomService.webLiveRoom(params);
         if(page.size() > 0){
-            map.put("pageSize", page.size());
-            map.put("currentPage", dto.getCurrentPage());
-            map.put("obj", page.getResult());
-            map.put("pages", page.getPages());
-            SysConfig configs = this.configService.findSysConfigList();
-            map.put("domain", configs.getDomain());
+            data.put("pageSize", page.size());
+            data.put("currentPage", dto.getCurrentPage());
+            data.put("obj", page.getResult());
+            data.put("pages", page.getPages());
         }
-        return ResponseUtil.ok(map);
+        return ResponseUtil.ok(data);
     }
 
 //    @RequiresPermissions("WEB:LIVEROOM:DETAIL")
     @ApiOperation("直播节目")
     @RequestMapping("/detail")
     public Object EnterStudio(@RequestBody LiveRoomDto dto){
-        Map map = new HashMap();
+        Map data = new HashMap();
         LiveRoom liveRoom = this.liveRoomService.getObjById(dto.getId());
         if(liveRoom == null){
             return ResponseUtil.badArgument();
@@ -115,7 +113,7 @@ public class LiveRoomViewController {
                     + accessory.getA_name();
             liveRoom.setPhoto(photo);
         }
-        map.put("obj", liveRoom);
+        data.put("obj", liveRoom);
         // 当前直播间下的上传视频
         params.clear();
         params.put("currentPage", 1);
@@ -142,10 +140,9 @@ public class LiveRoomViewController {
         playBack.put("currentPage", 1);
         playBack.put("pageSize", videoList.size());
 
-        map.put("video", video);
-        map.put("playBack", playBack);
-        map.put("domain", this.configService.findSysConfigList().getDomain());
-        return ResponseUtil.ok(map);
+        data.put("video", video);
+        data.put("playBack", playBack);
+        return ResponseUtil.ok(data);
     }
 
     public void getClass(Map map){

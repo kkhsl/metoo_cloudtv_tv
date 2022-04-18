@@ -22,7 +22,7 @@ public interface IUserService {
 
     User findObjById(Long id);
 
-    Page<UserVo> query(Map params);
+    Page<UserVo> query(UserDto dto);
 
     boolean save(UserDto dto);
 

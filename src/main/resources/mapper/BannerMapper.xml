@@ -44,6 +44,9 @@
                 AND mb.display = #{display}
             </if>
         </where>
+        ORDER BY
+         mb.sequence
+        DESC
     </select>
 
     <select id="findObjByMap" parameterType="map" resultMap="Base_Result_Map">
@@ -64,16 +67,16 @@
         INSERT INTO metoo_banner
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
-              id,
+               id,
             </if>
             <if test = "addTime != null">
-              addTime,
+               addTime,
             </if>
             <if test = "title != null and title != ''">
-              title,
+               title,
             </if>
             <if test = "sequence != null">
-             sequence,
+                sequence,
             </if>
             <if test = "display != null">
              display,

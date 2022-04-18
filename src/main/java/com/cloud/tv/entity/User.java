@@ -69,4 +69,15 @@ public class User extends IdEntity {
 
     @ApiModelProperty("版本号：乐观锁")
     private Integer version;
+
+    @ApiModelProperty("自定义锁，限制用户重试密码次数")
+    private boolean locked;
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 }

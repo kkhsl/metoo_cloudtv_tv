@@ -30,4 +30,15 @@ public class SysConfigServiceImpl implements ISysConfigService {
         return this.sysConfigMapper.update(instance);
     }
 
+    @Override
+    public boolean update(SysConfig instance) {
+        try {
+            this.sysConfigMapper.update(instance);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

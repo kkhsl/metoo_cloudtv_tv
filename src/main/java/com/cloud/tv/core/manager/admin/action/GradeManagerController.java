@@ -1,14 +1,13 @@
 package com.cloud.tv.core.manager.admin.action;
 
-import com.cloud.tv.core.service.IGradeService;
+import com.cloud.tv.core.service.*;
+import com.cloud.tv.core.utils.query.PageInfo;
 import com.cloud.tv.entity.Accessory;
 import com.cloud.tv.entity.Grade;
 import com.cloud.tv.entity.User;
 import com.github.pagehelper.Page;
 import com.cloud.tv.entity.SysConfig;
 import com.cloud.tv.core.manager.admin.tools.ShiroUserHolder;
-import com.cloud.tv.core.service.IAccessoryService;
-import com.cloud.tv.core.service.ISysConfigService;
 import com.cloud.tv.core.utils.ResponseUtil;
 import com.cloud.tv.dto.CourseDto;
 import com.cloud.tv.dto.GradeDto;
@@ -26,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+@RequiresPermissions("LK:GRADE:MANAGER")
 @Api("年级管理")
 @RestController
 @RequestMapping("/admin/grade")
@@ -37,8 +37,12 @@ public class GradeManagerController {
     private IAccessoryService accessoryService;
     @Autowired
     private ISysConfigService configService;
+    @Autowired
+    private IVideoService videoService;
+    @Autowired
+    private IRoomProgramService roomProgramService;
 
-    @RequiresPermissions("ADMIN:GRADE:LIST")
+//    @RequiresPermissions("ADMIN:GRADE:LIST")
     @ApiOperation("年级列表")
     @RequestMapping("/list")
     public Object list(@RequestBody CourseDto dto){
@@ -53,36 +57,26 @@ public class GradeManagerController {
             return ResponseUtil.unlogin();
         }
         Map data = new HashMap();
-        SysConfig configs = this.configService.findSysConfigList();
-        data.put("domain", configs.getDomain());
 
         Map params = new HashMap();
         params.put("pageSize", dto.getPageSize());
         params.put("startRow", (dto.getCurrentPage() ));
         Page<Grade> page = this.gradeService.query(params);
-        data.put("obj", page.getResult());
-        data.put("currentPage", page.getPageNum());
-        data.put("pageSize", page.getPageSize());
-        data.put("pages", page.getPages());
-        data.put("toral", page.getTotal());
-       return new Result(200, "Successfully", data);
+        return ResponseUtil.ok(new PageInfo<Grade>(page));
     }
 
-    @RequiresPermissions("ADMIN:GRADE:UPDATE")
+//    @RequiresPermissions("ADMIN:GRADE:UPDATE")
     @ApiOperation("年级更新")
     @PutMapping("/update")
     public Object update(@RequestBody GradeDto gradeDto){
-        Map data = new HashMap();
-        SysConfig configs = this.configService.findSysConfigList();
-        data.put("domain", configs.getDomain());
         Grade grade = this.gradeService.modify(gradeDto.getId());
         if(grade != null){
-            data.put("grade", grade);
+           return ResponseUtil.ok(grade);
         }
-        return new Result(200, "Successfully", data);
+        return ResponseUtil.ok();
     }
 
-    @RequiresPermissions("ADMIN:GRADE:SAVE")
+//    @RequiresPermissions("ADMIN:GRADE:SAVE")
     @ApiOperation("年级添加")
     @PostMapping("/save")
     public Object save(GradeDto gradeDto,
@@ -130,9 +124,9 @@ public class GradeManagerController {
         return null;
     }
 
-    @RequiresPermissions("ADMIN:GRADE:DELETE")
+//    @RequiresPermissions("ADMIN:GRADE:DELETE")
     @ApiOperation("年级删除")
-    @DeleteMapping("/delete")
+    @RequestMapping("/delete")
     public Object delete(@RequestBody GradeDto dto){
         Grade grade = this.gradeService.getObjById(dto.getId());
         if(grade == null){
@@ -148,15 +142,33 @@ public class GradeManagerController {
             if(file.exists()){
                 file.delete();
             }
-        }
-        if(  this.gradeService.delete(grade.getId())){
             this.accessoryService.delete(accessory.getId());
-            return new Result(200, "Successfully");
+        }
+        // 清除关联项
+        Map map = new HashMap();
+        map.put("grade_id", grade.getId());
+        map.put("currentPage", 0);
+        map.put("pageSize", 0);
+        List<Video> videoList = this.videoService.findObjByMap(map);
+        for(Video video : videoList){
+            video.setGrade(null);
+            this.videoService.update(video);
+        }
+        List<RoomProgram> roomProgramList = this.roomProgramService.findObjByCondition(map);
+
+        for(RoomProgram roomProgram : roomProgramList){
+            roomProgram.setGrade(null);
+            roomProgram.setGradeName(null);
+            this.roomProgramService.update(roomProgram);
+        }
+
+        if(this.gradeService.delete(grade.getId())){
+            return ResponseUtil.ok();
         }
         return ResponseUtil.prohibitDel();
     }
 
-    @RequiresPermissions("ADMIN:GRADE:CHANGE")
+//    @RequiresPermissions("ADMIN:GRADE:CHANGE")
     @ApiOperation("年级修改")
     @PutMapping("/change")
     public Object change(@RequestBody GradeReq req){

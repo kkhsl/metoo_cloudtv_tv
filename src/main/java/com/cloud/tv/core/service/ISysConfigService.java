@@ -9,4 +9,6 @@ public interface ISysConfigService {
     SysConfig findSysConfigList();
 
     int modify(SysConfig instance);
+
+    boolean update(SysConfig instance);
 }

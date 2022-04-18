@@ -59,4 +59,10 @@ public class SysConfig extends IdEntity {
     @ApiModelProperty("文件保存地址")
     private String uploadFilePath;
 
+    @ApiModelProperty("是否开启审核0：未开启 1：开启")
+    private Integer videoAudit;
+
+    @ApiModelProperty("应用唯一标识：暂时只使用AppId")
+    private String appId;
+
 }

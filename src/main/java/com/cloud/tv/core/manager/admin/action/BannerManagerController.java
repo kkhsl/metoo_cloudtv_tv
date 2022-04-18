@@ -34,22 +34,18 @@ public class BannerManagerController {
     @Autowired
     private IBannerService bannerService;
 
-    @RequiresPermissions("ADMIN:CAROUSEL:LIST")
+    @RequiresPermissions("LK:SYSCONFIG:MANAGER")
     @ApiOperation("轮播图列表")
     @RequestMapping("/carousel/list")
     public Object carousel(@RequestBody(required = false) BannerDto req){
         Page<Banner> page = this.bannerService.query(req);
         if(page.getResult().size() > 0){
-            Map map = new HashMap();
-            map.put("obj", new PageInfo<RoomProgram>(page));
-            SysConfig configs = this.configService.findSysConfigList();
-            map.put("domain", configs.getDomain());
-            return ResponseUtil.ok(map);
+            return ResponseUtil.ok(new PageInfo<RoomProgram>(page));
         }
         return ResponseUtil.ok();
     }
 
-    @RequiresPermissions("ADMIN:CAROUSEL:UPDATE")
+//    @RequiresPermissions("ADMIN:CAROUSEL:UPDATE")
     @ApiOperation("轮播图更新")
     @RequestMapping("/update")
     public Object update(@RequestBody BannerDto req){
@@ -66,22 +62,24 @@ public class BannerManagerController {
         return ResponseUtil.badArgument("未找到指定资源");
     }
 
-    @RequiresPermissions("ADMIN:CAROUSEL:SAVE")
+//    @RequiresPermissions("ADMIN:CAROUSEL:SAVE")
     @ApiOperation("轮播图保存")
     @RequestMapping("/save")
     public Object save(@RequestBody BannerDto dto){
         if(dto != null){
-            if(dto.getTitle() != null && !dto.getTitle().equals("")){
+           /* if(dto.getTitle() != null && !dto.getTitle().equals("")){
                 this.bannerService.save(dto);
                 return ResponseUtil.ok();
             }else{
                 return ResponseUtil.badArgument("请输入标题");
-            }
+            }*/
+            this.bannerService.save(dto);
+            return ResponseUtil.ok();
         }
         return ResponseUtil.badArgument();
     }
 
-    @RequiresPermissions("ADMIN:CAROUSEL:DELETE")
+//    @RequiresPermissions("ADMIN:CAROUSEL:DELETE")
     @ApiOperation("轮播图删除")
     @RequestMapping("/delete")
     public Object delete(@RequestBody BannerDto dto){

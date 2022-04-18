@@ -1,6 +1,7 @@
 package com.cloud.tv.entity;
 
 import com.cloud.tv.core.domain.IdEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -33,9 +34,11 @@ public class Role extends IdEntity {
     @ApiModelProperty("角色名称")
     private String name;
 
+    @JsonIgnore
     @ApiModelProperty("角色编码，根据改编码识别角色")
     private String roleCode;
 
+    @JsonIgnore
     @ApiModelProperty("角色类型")
     private String type;
 
@@ -45,12 +48,15 @@ public class Role extends IdEntity {
     @ApiModelProperty("权限集合")
     private List<Long> res_ids;
 
+    @JsonIgnore
     @ApiModelProperty("角色对应的组")
     private RoleGroup roleGroup;
 
+    @JsonIgnore
     @ApiModelProperty("角色路由：前端")
     private String url;
 
+    @JsonIgnore
     @ApiModelProperty("角色组件路由：前端")
     private String component;
 

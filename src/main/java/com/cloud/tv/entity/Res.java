@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * <p>
  *      Title: Res.java
@@ -40,6 +42,33 @@ public class Res extends IdEntity {
 
     @ApiModelProperty("角色")
     private Role role;
+
+    @ApiModelProperty("路由")
+    private String url;
+
+    @ApiModelProperty("组件")
+    private String component;
+
+    @ApiModelProperty("组件名称")
+    private String componentName;
+
+    @ApiModelProperty("组件图标")
+    private String icon;
+
+    @ApiModelProperty("索引")
+    private Integer sequence;
+
+    @ApiModelProperty("等级")
+    private Integer level;
+
+    @ApiModelProperty("childs")
+    private List<Res> childrenList;
+
+    @ApiModelProperty("父级ID")
+    private Long parentId;
+
+    @ApiModelProperty("父级名称")
+    private String parentName;
 
     /*@ApiModelProperty("角色集合")
     private List<Role> roles = new ArrayList<Role>();*/

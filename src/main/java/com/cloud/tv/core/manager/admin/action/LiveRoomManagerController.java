@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -105,7 +106,9 @@ public class LiveRoomManagerController {
     }
 */
 
-    @RequiresPermissions("ADMIN:LIVEROOM:LIST")
+//    @RequiresPermissions("ADMIN:LIVEROOM:LIST")
+
+    /*@RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间列表")
     @RequestMapping(value = "/list")
     public Object list(@RequestBody LiveRoomDto dto) {
@@ -119,10 +122,10 @@ public class LiveRoomManagerController {
         if(dto.getPageSize() == null || dto.getPageSize().equals("")){
             dto.setPageSize(15);
         }
-        int totalRow = this.liveRoomService.findAccountByTotal();// 查询总数
-        if(totalRow > 0){
-            int totalPages = totalRow / dto.getPageSize();// 总页数
-            int left = totalRow % dto.getPageSize();
+        int total = this.liveRoomService.findAccountByTotal();// 查询总数
+        if(total > 0){
+            int totalPages = total / dto.getPageSize();// 总页数
+            int left = total % dto.getPageSize();
             if(left > 0){
                 totalPages += 1;
             }
@@ -137,7 +140,7 @@ public class LiveRoomManagerController {
             params.put("currentPage", startRow);
             params.put("pageSize", dto.getPageSize());
 
-            /*  if(!user.getUserRole().equals("SUPPER")){
+            *//*  if(!user.getUserRole().equals("SUPPER")){
                 // 控制类型参数只能为0：避免前端随意传参
               if(user.getUserRole().equals("ADMIN")){ // 只有管理员才可筛选所有用户直播
                     if(dto.getType() == null || dto.getType() != 0){
@@ -150,19 +153,36 @@ public class LiveRoomManagerController {
                     userId = user.getId();
                 }
                 params.put("userId", user.getId());
-            }*/
+            }*//*
             params.put("deleteStatus", 0);
             params.put("userId", user.getId());
             List<LiveRoom> liveRooms = this.liveRoomService.findObjByMap(params);
             map.put("pages", totalPages);
-            map.put("totalRow",totalRow);
+            map.put("total",total);
             map.put("pageSize", liveRooms.size());
             map.put("list", liveRooms);
             map.put("userRole", user.getUserRole());
-            map.put("domain", sysConfig.getDomain());
         }
-        return new Result(200, "Successfully", map);
+        return ResponseUtil.ok(map);
+    }*/
+
+
+    @RequiresPermissions("LK:ROOM")
+    @ApiOperation("直播间列表")
+    @RequestMapping(value = "/list")
+    public Object list(@RequestBody LiveRoomDto dto) {
+        if(dto == null){
+            new LiveRoomDto();
+        }
+        User user = ShiroUserHolder.currentUser();
+        dto.setUserId(user.getId());
+        Page<LiveRoom> page = this.liveRoomService.query(dto);
+        if(page.getResult().size() > 0){
+            return ResponseUtil.ok(new PageInfo<LiveRoom>(page));
+        }
+        return ResponseUtil.ok();
     }
+
 
     /**
      * 更新直播间
@@ -170,11 +190,15 @@ public class LiveRoomManagerController {
      * @return
      */
 
-    @RequiresPermissions("ADMIN:LIVEROOM:UPDATE")
+//    @RequiresPermissions("ADMIN:LIVEROOM:UPDATE")
+
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间更新")
     @RequestMapping("update")
     public Object update(@RequestBody LiveRoom room){
         Map params = new HashMap();
+        params.put("currentPage", 0);
+        params.put("pageSize", 1);
         params.put("id", room.getId());
         List<LiveRoom> liveRoomList = this.liveRoomService.findObjByMap(params);
         if(liveRoomList.size() > 0){
@@ -183,10 +207,7 @@ public class LiveRoomManagerController {
             User currentUser = ShiroUserHolder.currentUser();
             if(currentUser.getId().equals(liveRoom.getUserId())){
                 if(liveRoom != null){
-                    Map data = new HashMap();
-                    data.put("domain", sysConfig.getDomain());
-                    data.put("obj", liveRoom);
-                    return ResponseUtil.ok(data);
+                    return ResponseUtil.ok(liveRoom);
                 }
             }
         }
@@ -213,7 +234,9 @@ public class LiveRoomManagerController {
      * @param instance
      * @return
      */
-    @RequiresPermissions("ADMIN:LIVEROOM:SAVE")
+//    @RequiresPermissions("ADMIN:LIVEROOM:SAVE")
+
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间保存")
     @RequestMapping(value = "save")
     public Object save(@RequestBody LiveRoom instance) {
@@ -249,7 +272,9 @@ public class LiveRoomManagerController {
      * @param
      * @return
      */
-    @RequiresPermissions("ADMIN:LIVEROOM:DELETE")
+//    @RequiresPermissions("ADMIN:LIVEROOM:DELETE")
+
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间删除")
     @RequestMapping(value = "delete")
     public Object delete(@RequestBody LiveRoomDto dto){
@@ -359,7 +384,8 @@ public class LiveRoomManagerController {
      * @param pageSize
      * @return
      */
-    @RequiresPermissions("")
+
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播PageHelper列表")
     @RequestMapping("/allLiveRoom")
     public Object queryAllLiveRoom(Integer currentPage, Integer pageSize){
@@ -390,6 +416,8 @@ public class LiveRoomManagerController {
      * @param query
      * @return
      */
+
+    @RequiresPermissions("LK:ROOM")
     @RequestMapping("/liverooms")
     public Object liveroom(String query){
         Map map = new HashMap();
@@ -416,7 +444,9 @@ public class LiveRoomManagerController {
      * @param dto
      * @return
      */
-    @RequiresPermissions("ADMIN:LIVEROOM:CHANGE")
+//    @RequiresPermissions("ADMIN:LIVEROOM:CHANGE")
+
+    @RequiresPermissions("LK:ROOM")
     @ApiOperation("直播间修改")
     @RequestMapping("/change")
     public Object change(@RequestBody LiveRoomDto dto){
@@ -466,16 +496,15 @@ public class LiveRoomManagerController {
 
 
 //    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:LIST")
+
+    @RequiresPermissions("LK:ROOM:MANAGER")
     @ApiOperation("直播间管理-列表")
     @RequestMapping(value = "/manager/list")
     public Object buyerLiveRoom(@RequestBody LiveRoomDto dto) {
         Map map = new HashMap();
         Page<LiveRoom> page  = this.liveRoomService.query(dto);
         if(page.getResult().size() > 0){
-            map.put("obj", new PageInfo<LiveRoom>(page));
-            SysConfig configs = this.configService.findSysConfigList();
-            map.put("domain", configs.getDomain());
-            return ResponseUtil.ok(map);
+            return ResponseUtil.ok(new PageInfo<LiveRoom>(page));
         }
         return ResponseUtil.ok();
     }
@@ -486,6 +515,7 @@ public class LiveRoomManagerController {
      * @return
      */
 //    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:UPDATE")
+    @RequiresPermissions("LK:ROOM:MANAGER")
     @ApiOperation("直播间管理-更新")
     @RequestMapping("/manager/update")
     public Object managerUpdate(@RequestBody LiveRoom room){
@@ -502,6 +532,7 @@ public class LiveRoomManagerController {
      * @return
      */
 //    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:CHANGE")
+    @RequiresPermissions("LK:ROOM:MANAGER")
     @ApiOperation("直播间管理-修改")
     @RequestMapping("/manager/change")
     public Object managerChange(@RequestBody LiveRoomDto dto){
@@ -525,7 +556,8 @@ public class LiveRoomManagerController {
      * @param instance
      * @return
      */
-    @RequiresPermissions("ADMIN:LIVEROOM:SAVE")
+//    @RequiresPermissions("ADMIN:LIVEROOM:SAVE")
+    @RequiresPermissions("LK:ROOM:MANAGER")
     @ApiOperation("直播间管理-保存")
     @RequestMapping(value = "/manager/save")
     public Object managerSave(@RequestBody LiveRoom instance) {
@@ -556,6 +588,7 @@ public class LiveRoomManagerController {
      * @return
      */
 //    @RequiresPermissions("ADMIN:MANAGERLIVEROOM:DELETE")
+    @RequiresPermissions("LK:ROOM:MANAGER")
     @ApiOperation("直播间管理-删除")
     @RequestMapping(value = "/manager/delete")
     public Object managerDelete(@RequestBody LiveRoomDto dto){

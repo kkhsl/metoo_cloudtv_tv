@@ -41,14 +41,14 @@ public class RoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public List<Role> findRoleByType(String type) {
-        return this.roleMapper.findRoleByType(type);
+    public Role findObjByName(String name) {
+        return this.roleMapper.findRoleByName(name);
     }
 
+
     @Override
-    public boolean countBy(String name) {
-        int count = this.roleMapper.countBy(name);
-        return count != 0;
+    public List<Role> findRoleByType(String type) {
+        return this.roleMapper.findRoleByType(type);
     }
 
     @Override
@@ -85,13 +85,7 @@ public class RoleServiceImpl implements IRoleService {
         }else{
             role = this.roleMapper.findRoleById(instance.getId());
         }
-        if(instance.getRg_id() != null){
-            RoleGroup roleGroup = this.roleGroupService.getObjById(instance.getRg_id());
-            role.setRoleGroup(roleGroup);
-        }
-
         BeanUtils.copyProperties(instance, role);
-        role.setType("ADMIN");
         if(role.getId() == null){
             try {
                 this.roleMapper.insert(role);
@@ -147,19 +141,19 @@ public class RoleServiceImpl implements IRoleService {
     }
 
     @Override
-    public List<Role> query(Map params) {
-
-//         Page<Role> page = PageHelper.startPage((Integer)params.get("startRow"), (Integer)params.get("pageSize"));
-//        return page;
-        return this.roleMapper.query(params);
-
+    public Page<Role> query(RoleDto dto) {
+        Page<Role> page = PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+            this.roleMapper.query(dto);
+        return page;
     }
 
     @Override
-    public List<RoleVo> queryRole(Map params) {
-       Page<RoleVo> page = PageHelper.startPage((Integer)params.get("currentPage"), (Integer)params.get("pageSize"));
-         this.roleMapper.queryVo(params);
-       return page;
+    public List<Role> findObjByMap(Map params) {
+
+        Page<Role> page = PageHelper.startPage((Integer)params.get("currentPage"), (Integer)params.get("pageSize"));
+
+        return this.roleMapper.findObjByMap(params);
+
     }
 
     @Override

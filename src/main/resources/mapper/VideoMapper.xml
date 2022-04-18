@@ -109,7 +109,9 @@
         LEFT JOIN metoo_course mc on mv.course_id=mc.id
         LEFT JOIN metoo_live_room mlr ON mlr.id = mv.liveRoomId
         <where>
-
+            <if test="name != null">
+                AND mv.name LIKE CONCAT('%', #{name}, '%')
+            </if>
             <if test="userId != null">
                 AND mv.userId = #{userId, jdbcType=BIGINT}
             </if>
@@ -185,6 +187,12 @@
             </if>
             <if test = "genre != null">
                 AND mv.genre = #{genre}
+            </if>
+            <if test = "course_id != null">
+                AND mv.course_id = #{course_id}
+            </if>
+            <if test = "grade_id != null">
+                AND mv.grade_id = #{grade_id}
             </if>
         </where>
         <if test = "orderBy != null">
@@ -432,7 +440,7 @@
             <if test="video != null ">
                 video_id=#{video.id},
             </if>
-            <if test="course != null ">
+            <if test="course != '' ">
                 course_id=#{course.id},
             </if>
             <if test="lecturer != null ">

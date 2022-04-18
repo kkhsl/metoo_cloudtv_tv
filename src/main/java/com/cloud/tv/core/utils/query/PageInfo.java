@@ -21,7 +21,7 @@ public class PageInfo<T> {
     @ApiModelProperty("Mybatis分页对象")
     private Page<T> page;
 
-    @ApiModelProperty("由第几条开始")
+    @ApiModelProperty("起始条数")
     private Integer startRow;
 
     @ApiModelProperty("每页条数")

@@ -87,7 +87,7 @@ public class VideoViewController {
     @PostMapping("/list")
     public Object list(@RequestBody(required = false) VideoDto dto){
 
-        Map map = new HashMap();
+        Map data = new HashMap();
         SysConfig config = this.configService.findSysConfigList();
         if(dto.getCurrentPage() == null){
             dto.setCurrentPage(1);
@@ -120,13 +120,13 @@ public class VideoViewController {
 
         Page<Video> page =  this.videoService.query(dto);
 
-        map.put("obj", page.getResult());
-        map.put("currentPage", page.getPageNum());
-        map.put("pageSize", page.getPageNum());
-        map.put("pages", page.getPages());
-        map.put("total", page.getTotal());
-        map.put("domain", config.getDomain());
-        return ResponseUtil.ok(map);
+        data.put("obj", page.getResult());
+        data.put("currentPage", page.getPageNum());
+        data.put("pageSize", page.getPageNum());
+        data.put("pages", page.getPages());
+        data.put("total", page.getTotal());
+        data.put("domain", config.getDomain());
+        return ResponseUtil.ok(data);
     }
 
 

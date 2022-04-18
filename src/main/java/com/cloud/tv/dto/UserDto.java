@@ -14,10 +14,9 @@ import java.util.Date;
 @ApiModel("用户DTO")
 @Data
 @Accessors(chain = true)
-@AllArgsConstructor(staticName = "of")
+@AllArgsConstructor
 @NoArgsConstructor
 public class UserDto extends PageDto<User>{
-
 
     /**
      * AllArgsConstructor注解和NotNull注解配合使用，参数不为null

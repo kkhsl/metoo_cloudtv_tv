@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.tv.core.mapper.MonitorMapper">
+
+    <resultMap id="Base_Result_Map" type="com.cloud.tv.entity.Monitor">
+        <id column="id" property="id" javaType="Long" jdbcType="BIGINT"></id>
+        <result column="addTime" property="addTime"></result>
+        <result column="title" property="title"></result>
+        <result column="beginTme" property="beginTme"></result>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+            id, addTime, title, beginTime
+        </sql>
+
+    <select id="getObjById" parameterType="Long" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_monitor monitor
+        WHERE monitor.id = #{id, jdbcType=BIGINT}
+    </select>
+
+    <select id="getObjBySign" parameterType="java.lang.String" resultMap="Base_Result_Map">
+        SELECT <include refid="Base_Column_List"/>
+        FROM metoo_monitor monitor
+        WHERE monitor.sign = #{sign, jdbcType=VARCHAR}
+    </select>
+
+    <resultMap id="Base_Query_Map" type="com.cloud.tv.vo.MonitorVo">
+        <id column="id" property="id" jdbcType="BIGINT" javaType="Long"></id>
+        <result column="appId" property="appId"></result>
+        <result column="addTime" property="addTime" jdbcType="TIMESTAMP" javaType="java.util.Date"></result>
+        <result column="title" property="title" jdbcType="VARCHAR" javaType="java.lang.String"></result>
+        <result column="beginTime" property="beginTime" jdbcType="TIMESTAMP" javaType="java.util.Date"></result>
+        <result column="endTime" property="endTime" jdbcType="TIMESTAMP" javaType="java.util.Date"></result>
+        <result column="username" property="username"></result>
+        <result column="liveRoomTitle" property="liveRoomTitle"></result>
+        <result column="roomProgramTitle" property="roomProgramTitle"></result>
+        <result column="status" property="status"></result>
+        <result column="number" property="number"></result>
+        <result column="duration" property="duration"></result>
+        <result column="durationTotal" property="durationTotal"></result>
+        <!--<association property="user" javaType="com.cloud.tv.entity.User">
+            <id column="userId" property="id"></id>
+            <result column="username" property="username" jdbcType="VARCHAR" javaType="java.lang.String"></result>
+         </association>
+        <association property="liveRoom" javaType="com.cloud.tv.entity.LiveRoom">
+            <id column="liveRoomId" property="id"  javaType="java.lang.Long"></id>
+            <result column="liveRoomTitle" property="title"></result>
+        </association>-->
+    </resultMap>
+
+    <sql id="Base_Qurey_List">
+        monitor.*
+    </sql>
+
+    <select id="query" parameterType="com.cloud.tv.dto.MonitorDto" resultMap="Base_Query_Map">
+        SELECT <include refid="Base_Qurey_List"/>
+        FROM metoo_monitor monitor
+        <where>
+            <if test="id != null">
+                AND id=#{id}
+            </if>
+            <if test="appId != null">
+                AND appId=#{appId}
+            </if>
+            <if test="beginTime != null and endTime != null and beginTime != '' and endTime != ''">
+                AND addTime BETWEEN #{beginTime} AND #{endTime}
+            </if>
+        </where>
+        order by monitor.addTime DESC
+    </select>
+
+    <select id="querySchool" parameterType="com.cloud.tv.dto.MonitorDto" resultMap="Base_Query_Map">
+        SELECT monitor.*, SUM(`live`) number, SUM(`duration`) durationTotal
+        FROM metoo_monitor monitor
+        GROUP BY appId
+        order by monitor.addTime DESC
+    </select>
+
+    <insert id="save" parameterType="com.cloud.tv.entity.Monitor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO metoo_monitor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="addTime != null">
+                addTime,
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="liveRoomTitle != null">
+                liveRoomTitle,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="beginTime != null">
+                beginTime,
+            </if>
+            <if test="endTime != null">
+                endTime,
+            </if>
+            <if test="appId != null">
+                appId,
+            </if>
+            <if test="sign != null">
+                sign,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="duration != null">
+                duration,
+            </if>
+        </trim>
+        <trim prefix="VALUES( " suffix=")" suffixOverrides="," >
+            <if test="addTime != null">
+                #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                #{deleteStatus},
+            </if>
+            <if test="title != null">
+                #{title},
+            </if>
+            <if test="liveRoomTitle != null">
+                #{liveRoomTitle},
+            </if>
+            <if test="username != null">
+                #{username},
+            </if>
+            <if test="beginTime != null">
+                #{beginTime},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="appId != null">
+                #{appId},
+            </if>
+            <if test="sign != null">
+                #{sign},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="duration != null">
+                #{duration},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.cloud.tv.entity.Monitor">
+        UPDATE metoo_monitor
+        <set>
+            <if test="addTime != null">
+                addTime = #{addTime},
+            </if>
+            <if test="deleteStatus != null">
+                deleteStatus = #{deleteStatus},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="liveRoomTitle != null">
+                liveRoomTitle = #{liveRoomTitle},
+            </if>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="beginTime != null">
+                beginTime = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                endTime = #{endTime},
+            </if>
+            <if test="appId != null">
+                appId = #{appId},
+            </if>
+            <if test="sign != null">
+                sign = #{sign},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="duration != null">
+                duration = #{duration},
+            </if>
+        </set>
+        <where>
+            id = #{id,jdbcType=BIGINT}
+        </where>
+    </update>
+</mapper>

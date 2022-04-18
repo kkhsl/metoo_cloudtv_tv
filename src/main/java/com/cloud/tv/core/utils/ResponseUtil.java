@@ -64,6 +64,8 @@ public class ResponseUtil {
 
     public static Object badArgument(String message) { return fail(400, message);} //未找到指定资源
 
+    public static Object badArgument(int code, String message) { return fail(code, message);} //未找到指定资源
+
     public static Object update() {
         return new Result(200, "Modify successfully");
     }
